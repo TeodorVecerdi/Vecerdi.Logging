@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Vecerdi.Logging;
 using Object = UnityEngine.Object;
 
 namespace Vecerdi.Logging.Unity {

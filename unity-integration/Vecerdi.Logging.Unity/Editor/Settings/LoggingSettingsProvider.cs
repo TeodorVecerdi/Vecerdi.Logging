@@ -216,6 +216,6 @@ namespace Vecerdi.Logging.Unity.Editor {
         }
 
         [SettingsProvider]
-        internal static SettingsProvider CreateProvider() => new LoggingSettingsProvider("Project/Logging");
+        internal static SettingsProvider CreateProvider() => new LoggingSettingsProvider("Project/Vecerdi.Logging");
     }
 }
