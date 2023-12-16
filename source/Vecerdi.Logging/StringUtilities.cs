@@ -2,7 +2,7 @@
 
 namespace Vecerdi.Logging;
 
-internal static class StringUtilities {
+public static class StringUtilities {
     /// <summary>
     /// Concatenates two <see cref="T:System.ReadOnlySpan`1"/> instances and returns a new string.
     /// </summary>
