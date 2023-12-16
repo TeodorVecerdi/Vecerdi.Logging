@@ -201,6 +201,7 @@ namespace Vecerdi.Logging.Unity.Editor {
             };
             FontAsset robotoMonoRegularAsset = (FontAsset)EditorGUIUtility.Load("RobotoMono-Regular SDF");
             noCategoriesCodeLabel.style.unityFontDefinition = new StyleFontDefinition(robotoMonoRegularAsset);
+            noCategoriesCodeLabel.selection.isSelectable = true;
             rootElement.Add(noCategoriesCodeLabel);
             return;
 
