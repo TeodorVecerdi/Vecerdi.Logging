@@ -124,7 +124,7 @@ namespace Vecerdi.Logging.Unity {
                 s_Instance.Save();
             }
 #else
-            s_Instance = Resources.Load<LoggingSettings>("LoggingSettings");
+            s_Instance = Resources.Load<LoggingSettings>("Vecerdi.Logging/LoggingSettings");
 #endif
             s_Instance.UpdateCategories();
             return s_Instance;
