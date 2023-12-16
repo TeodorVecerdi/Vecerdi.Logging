@@ -1,0 +1,16 @@
+{
+    "name": "dev.vecerdi.logging-unity",
+    "version": "1.0.0",
+    "displayName": "Vecerdi.Logging - Unity Integration",
+    "description": "Unity integration for the Vecerdi.Logging library.",
+    "unity": "2021.3",
+    "dependencies": {},
+    "keywords": [
+        "logging"
+    ],
+    "author": {
+        "name": "Teodor Vecerdi",
+        "email": "teodor@vecerdi.dev",
+        "url": "https://vecerdi.dev"
+    }
+}

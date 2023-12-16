@@ -1,8 +1,8 @@
 {
     "name": "Vecerdi.Logging.Unity.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "Vecerdi.Logging.Unity.Editor",
     "references": [
-        "GUID:a351fe2b887f4ed4e91615d6520dea97"
+        "Vecerdi.Logging.Unity"
     ],
     "includePlatforms": [
         "Editor"
