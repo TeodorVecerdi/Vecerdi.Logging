@@ -13,7 +13,7 @@ namespace Vecerdi.Logging.Unity.Editor {
             LoggingSettings settings = LoggingSettings.GetOrCreateSettings();
             settings.UpdateCategories();
 
-            string resourcesPath = Path.Combine(Application.dataPath, "Resources");
+            string resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
             if (!Directory.Exists(resourcesPath)) {
                 Directory.CreateDirectory(resourcesPath);
             }
@@ -33,7 +33,7 @@ namespace Vecerdi.Logging.Unity.Editor {
         public int callbackOrder => 0;
 
         public void OnPostprocessBuild(UnityEditor.Build.Reporting.BuildReport report) {
-            string resourcesPath = Path.Combine(Application.dataPath, "Resources");
+            string resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
             string assetPath = Path.Combine(resourcesPath, LoggingSettings.ASSET_NAME);
 
             if (File.Exists(assetPath)) {
