@@ -1,6 +1,6 @@
 {
     "name": "dev.vecerdi.logging-unity",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "displayName": "Vecerdi.Logging - Unity Integration",
     "description": "Unity integration for the Vecerdi.Logging library.",
     "unity": "2021.3",
