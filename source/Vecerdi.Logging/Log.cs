@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
 namespace Vecerdi.Logging;
@@ -15,7 +14,9 @@ public static class Log {
     /// </summary>
     /// <param name="logger">The logger to register.</param>
     /// <exception cref="ArgumentNullException">Given <see cref="T:Vecerdi.Logging.ILogger"/> is null.</exception>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void RegisterLogger(ILogger logger) {
         if (logger is null) throw new ArgumentNullException(nameof(logger));
 
@@ -39,7 +40,9 @@ public static class Log {
     /// <param name="logger">The logger to unregister.</param>
     /// <exception cref="ArgumentNullException">Given <see cref="T:Vecerdi.Logging.ILogger"/> is null.</exception>
     /// <exception cref="ArgumentException">Given <see cref="T:Vecerdi.Logging.ILogger"/> is not registered.</exception>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void UnregisterLogger(ILogger logger) {
         if (logger is null) throw new ArgumentNullException(nameof(logger));
 
@@ -55,7 +58,9 @@ public static class Log {
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Message(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
         if (s_Loggers.Count == 0) {
             if (logLevel >= DefaultLogger.MinimumLogLevel) {
@@ -80,7 +85,9 @@ public static class Log {
     /// <param name="logLevel">The log level of the message.</param>
     [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
         string message = StringUtilities.Format(format, arg0);
         Message(message, category, context, logLevel);
@@ -97,7 +104,9 @@ public static class Log {
     /// <param name="logLevel">The log level of the message.</param>
     [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> arg1, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
         string message = StringUtilities.Format(format, arg0, arg1);
         Message(message, category, context, logLevel);
@@ -115,7 +124,9 @@ public static class Log {
     /// <param name="logLevel">The log level of the message.</param>
     [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> arg1, ReadOnlySpan<char> arg2, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
         string message = StringUtilities.Format(format, arg0, arg1, arg2);
         Message(message, category, context, logLevel);
@@ -134,7 +145,9 @@ public static class Log {
     /// <param name="logLevel">The log level of the message.</param>
     [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> arg1, ReadOnlySpan<char> arg2, ReadOnlySpan<char> arg3, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
         string message = StringUtilities.Format(format, arg0, arg1, arg2, arg3);
         Message(message, category, context, logLevel);
@@ -150,7 +163,9 @@ public static class Log {
     /// <param name="args">The arguments to format.</param>
     [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information, params string?[] args) {
         string message = StringUtilities.Format(format, args);
         Message(message, category, context, logLevel);
@@ -163,7 +178,9 @@ public static class Log {
     /// <param name="category">The category of the exception.</param>
     /// <param name="context">The context of the exception.</param>
     /// <param name="logLevel">The log level of the exception message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Exception(Exception? exception, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Error) {
         if (s_Loggers.Count == 0) {
             if (logLevel >= DefaultLogger.MinimumLogLevel) {
@@ -184,7 +201,9 @@ public static class Log {
     /// <param name="message">The message to log.</param>
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Trace(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null) => Message(message, category, context, LogLevel.Trace);
 
     /// <summary>
@@ -193,7 +212,9 @@ public static class Log {
     /// <param name="message">The message to log.</param>
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Debug(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null) => Message(message, category, context, LogLevel.Debug);
 
     /// <summary>
@@ -202,7 +223,9 @@ public static class Log {
     /// <param name="message">The message to log.</param>
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Information(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null) => Message(message, category, context, LogLevel.Information);
 
     /// <summary>
@@ -211,7 +234,9 @@ public static class Log {
     /// <param name="message">The message to log.</param>
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Warning(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null) => Message(message, category, context, LogLevel.Warning);
 
     /// <summary>
@@ -220,7 +245,9 @@ public static class Log {
     /// <param name="message">The message to log.</param>
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Error(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null) => Message(message, category, context, LogLevel.Error);
 
     /// <summary>
@@ -229,6 +256,8 @@ public static class Log {
     /// <param name="message">The message to log.</param>
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
-    [Conditional(Conditionals.ENABLE_LOGGING)]
+#if NO_LOGGING
+    [System.Diagnostics.Conditional("")]
+#endif
     public static void Critical(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null) => Message(message, category, context, LogLevel.Critical);
 }
