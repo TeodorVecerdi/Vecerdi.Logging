@@ -23,7 +23,7 @@ namespace Vecerdi.Logging.Unity.Editor {
                 File.Delete(destinationPath);
             }
 
-            string relativePath = Path.Combine("Assets", "Resources", LoggingSettings.ASSET_NAME);
+            string relativePath = Path.Combine("Assets", "Resources", "Vecerdi.Logging", LoggingSettings.ASSET_NAME);
             AssetDatabase.CreateAsset(settings, relativePath);
             AssetDatabase.Refresh();
         }
@@ -44,6 +44,12 @@ namespace Vecerdi.Logging.Unity.Editor {
             if (!Directory.EnumerateFiles(resourcesPath).Any()) {
                 Directory.Delete(resourcesPath);
                 File.Delete($"{resourcesPath}.meta");
+            }
+
+            string parentDirectory = Directory.GetParent(resourcesPath)!.FullName;
+            if (!Directory.EnumerateFiles(parentDirectory).Any()) {
+                Directory.Delete(parentDirectory);
+                File.Delete($"{parentDirectory}.meta");
             }
 
             AssetDatabase.Refresh();
