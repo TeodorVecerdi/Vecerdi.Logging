@@ -1,8 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿namespace Vecerdi.Logging;
 
-namespace Vecerdi.Logging;
-
-[PublicAPI]
 public interface ILogger {
     /// <summary>
     /// The minimum log level to log.
