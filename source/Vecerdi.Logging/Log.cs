@@ -86,7 +86,7 @@ public static class Log {
     [System.Diagnostics.Conditional("")]
 #endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
-        string message = StringUtilities.Format(format, arg0);
+        var message = StringUtilities.Format(format, arg0).AsSpan();
         Message(message, category, context, logLevel);
     }
 
@@ -104,7 +104,7 @@ public static class Log {
     [System.Diagnostics.Conditional("")]
 #endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> arg1, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
-        string message = StringUtilities.Format(format, arg0, arg1);
+        var message = StringUtilities.Format(format, arg0, arg1).AsSpan();
         Message(message, category, context, logLevel);
     }
 
@@ -123,7 +123,7 @@ public static class Log {
     [System.Diagnostics.Conditional("")]
 #endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> arg1, ReadOnlySpan<char> arg2, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
-        string message = StringUtilities.Format(format, arg0, arg1, arg2);
+        var message = StringUtilities.Format(format, arg0, arg1, arg2).AsSpan();
         Message(message, category, context, logLevel);
     }
 
@@ -143,7 +143,7 @@ public static class Log {
     [System.Diagnostics.Conditional("")]
 #endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> arg0, ReadOnlySpan<char> arg1, ReadOnlySpan<char> arg2, ReadOnlySpan<char> arg3, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
-        string message = StringUtilities.Format(format, arg0, arg1, arg2, arg3);
+        var message = StringUtilities.Format(format, arg0, arg1, arg2, arg3).AsSpan();
         Message(message, category, context, logLevel);
     }
 
@@ -160,7 +160,7 @@ public static class Log {
     [System.Diagnostics.Conditional("")]
 #endif
     public static void Format(ReadOnlySpan<char> format, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information, params string?[] args) {
-        string message = StringUtilities.Format(format, args);
+        var message = StringUtilities.Format(format, args).AsSpan();
         Message(message, category, context, logLevel);
     }
 
