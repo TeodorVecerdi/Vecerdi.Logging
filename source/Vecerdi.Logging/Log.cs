@@ -1,9 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 
 namespace Vecerdi.Logging;
 
-[PublicAPI]
 public static class Log {
     private static readonly HashSet<ILogger> s_Loggers = new();
 
@@ -83,7 +81,6 @@ public static class Log {
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
-    [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NO_LOGGING
     [System.Diagnostics.Conditional("")]
@@ -102,7 +99,6 @@ public static class Log {
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
-    [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NO_LOGGING
     [System.Diagnostics.Conditional("")]
@@ -122,7 +118,6 @@ public static class Log {
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
-    [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NO_LOGGING
     [System.Diagnostics.Conditional("")]
@@ -143,7 +138,6 @@ public static class Log {
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
-    [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NO_LOGGING
     [System.Diagnostics.Conditional("")]
@@ -161,7 +155,6 @@ public static class Log {
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
     /// <param name="args">The arguments to format.</param>
-    [StringFormatMethod(nameof(format))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NO_LOGGING
     [System.Diagnostics.Conditional("")]
