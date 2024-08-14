@@ -15,8 +15,8 @@ internal class ConsoleLogger : ILogger {
     /// <param name="logLevel">The log level of the message.</param>
     public void Message(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information) {
         string m = context is not null
-            ? StringUtilities.Format("[{}/{}] {}", category, context.ToString(), message)
-            : StringUtilities.Format("[{}] {}", category, message);
+            ? StringUtilities.Format("[{}/{}] {}".AsSpan(), category, context.ToString().AsSpan(), message)
+            : StringUtilities.Format("[{}] {}".AsSpan(), category, message);
         Console.WriteLine(m);
     }
 
@@ -29,8 +29,8 @@ internal class ConsoleLogger : ILogger {
     /// <param name="logLevel">The log level of the exception message.</param>
     public void Exception(Exception? exception, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Error) {
         string m = context is not null
-            ? StringUtilities.Format("[{}/{}] {}", category, context.ToString(), exception?.ToString() ?? "null")
-            : StringUtilities.Format("[{}] {}", category, exception?.ToString() ?? "null");
+            ? StringUtilities.Format("[{}/{}] {}".AsSpan(), category, context.ToString().AsSpan(), (exception?.ToString() ?? "null").AsSpan())
+            : StringUtilities.Format("[{}] {}".AsSpan(), category, (exception?.ToString() ?? "null").AsSpan());
 
         Console.WriteLine(m);
     }
