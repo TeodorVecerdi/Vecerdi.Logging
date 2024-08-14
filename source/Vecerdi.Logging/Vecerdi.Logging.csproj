@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageVersion>1.2.0</PackageVersion>
+        <PackageVersion>1.3.0</PackageVersion>
         <Title>Vecerdi.Logging</Title>
         <PackageId>Vecerdi.Logging</PackageId>
         <Authors>Teodor Vecerdi</Authors>
