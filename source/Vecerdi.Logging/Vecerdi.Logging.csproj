@@ -13,7 +13,30 @@
         <DebugType>pdbonly</DebugType>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackageVersion>1.0.0</PackageVersion>
+        <Title>Vecerdi.Logging</Title>
+        <PackageId>Vecerdi.Logging</PackageId>
+        <Authors>Teodor Vecerdi</Authors>
+        <Description>Simple .NET Logging Library</Description>
+
+        <Author>$(Authors)</Author>
+        <Version>$(PackageVersion)</Version>
+
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/TeodorVecerdi/Vecerdi.Logging</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/TeodorVecerdi/Vecerdi.Logging</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>logging unity</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="/" />
+        <None Include="../../LICENSE" Pack="true" PackagePath="/" />
     </ItemGroup>
 </Project>
