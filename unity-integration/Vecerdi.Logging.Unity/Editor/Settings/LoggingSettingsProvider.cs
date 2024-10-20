@@ -174,7 +174,15 @@ namespace Vecerdi.Logging.Unity.Editor {
                 showBoundCollectionSize = false,
             };
 
-            logCategoriesListView.BindProperty(logCategories);
+            // Adjust the header margin based on the presence of the vertical scroller
+            var scrollView = (ScrollView)logCategoriesListView.hierarchy[0];
+            scrollView.verticalScroller.RegisterCallback<GeometryChangedEvent, ScrollView>((_, view) => {
+                if (view.userData != null && (bool)view.userData == view.verticalScroller.enabledSelf) return;
+                view.userData = view.verticalScroller.enabledSelf;
+                logLevelHeader.style.marginRight = view.verticalScroller.enabledSelf ? view.verticalScroller.resolvedStyle.width : 0;
+            }, scrollView);
+
+            logCategoriesListView.BindProperty(logCategoriesProperty);
             rootElement.Add(logCategoriesListView);
 
             VisualElement footer = new() { name = "LogCategoriesListFooter" };
