@@ -116,6 +116,13 @@ namespace Vecerdi.Logging.Unity.Editor {
         }
 
         private void CreateLogCategoriesListView(VisualElement rootElement) {
+            var logCategoriesList = new FilterableLogCategoryList(LoggingSettings.LogCategories);
+            var logCategoriesProperty = SerializedSettings.FindProperty("m_LogCategories");
+
+            ToolbarSearchField searchField = new() { name = "LogCategoriesSearchField" };
+            searchField.RegisterValueChangedCallback(evt => logCategoriesList.SetFilter(evt.newValue));
+            rootElement.Add(searchField);
+
             VisualElement header = new() { name = "LogCategoriesListHeader" };
 
             Label categoryNameHeader = new("Category Name");
@@ -128,8 +135,6 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             rootElement.Add(header);
 
-            var logCategoriesProperty = SerializedSettings.FindProperty("m_LogCategories");
-            var logCategoriesList = new FilterableLogCategoryList(LoggingSettings.LogCategories);
 
             // Create a new item template that mimics a multi-column layout
             Func<VisualElement> makeItem = () => {
@@ -175,7 +180,9 @@ namespace Vecerdi.Logging.Unity.Editor {
                 showBoundCollectionSize = false,
                 itemsSource = logCategoriesList,
             };
+            rootElement.Add(logCategoriesListView);
 
+            logCategoriesList.CollectionView = logCategoriesListView;
             // Adjust the header margin based on the presence of the vertical scroller
             var scrollView = (ScrollView)logCategoriesListView.hierarchy[0];
             scrollView.verticalScroller.RegisterCallback<GeometryChangedEvent, ScrollView>((_, view) => {
@@ -183,10 +190,6 @@ namespace Vecerdi.Logging.Unity.Editor {
                 view.userData = view.verticalScroller.enabledSelf;
                 logLevelHeader.style.marginRight = view.verticalScroller.enabledSelf ? view.verticalScroller.resolvedStyle.width : 0;
             }, scrollView);
-
-            logCategoriesList.CollectionView = logCategoriesListView;
-            logCategoriesListView.BindProperty(logCategoriesProperty);
-            rootElement.Add(logCategoriesListView);
 
             VisualElement footer = new() { name = "LogCategoriesListFooter" };
             Label countLabel = new($"{LoggingSettings.LogCategories.Count} log categories");
