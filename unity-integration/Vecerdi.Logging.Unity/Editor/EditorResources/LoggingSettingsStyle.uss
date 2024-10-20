@@ -6,11 +6,30 @@
 
 #LogCategoriesLabel {
     margin-top: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     font-size: 16px;
     -unity-font-style: bold;
 }
 
+#LogCategoriesSearchField {
+    height: 24px;
+    width: auto;
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+#LogCategoriesSearchField #unity-search {
+    margin-left: 4px;
+    margin-right: 6px;
+}
+
+#LogCategoriesSearchField #unity-cancel {
+    margin-right: 4px;
+}
+
+#LogCategoriesSearchField #unity-text-input {
+    font-size: 13px;
+}
 
 #Vecerdi-Logging-Settings {
     padding: 10px 20px;
@@ -20,9 +39,11 @@
 #GlobalLogLevel {
     margin-left: 0;
 }
+
 #GlobalLogLevel Label {
     min-width: var(--property-field-label-width);
 }
+
 #GlobalLogLevel Label, #GlobalLogLevel TextElement {
     font-size: 14px;
 }
@@ -32,6 +53,7 @@
     align-items: stretch;
     margin-top: 1px;
     margin-bottom: 10px;
+    flex-shrink: 0;
 }
 
 #OverrideLogLevelInBuilds {
@@ -39,14 +61,17 @@
     height: 20px;
     align-items: center;
 }
+
 #OverrideLogLevelInBuilds Label {
     font-size: 14px;
     min-width: 212px;
 }
+
 #OverrideLogLevelInBuilds #unity-checkmark {
     height: 15px;
     width: 15px;
 }
+
 #OverrideLogLevelInBuilds .unity-toggle__input {
     flex-shrink: 1;
     flex-grow: 0;
@@ -58,6 +83,7 @@
     flex-grow: 1;
     height: 21px;
 }
+
 #LogLevelInBuilds TextElement {
     font-size: 14px;
 }
@@ -66,9 +92,11 @@
 #CategoryNameTransforms {
     margin-left: 0;
 }
+
 #CategoryNameTransforms Label {
     min-width: var(--property-field-label-width);
 }
+
 #CategoryNameTransforms Label, #CategoryNameTransforms PopupTextElement {
     font-size: 14px;
 }
@@ -78,9 +106,11 @@
     height: 20px;
     align-items: center;
 }
+
 #EnableColoredOutputInEditor Label {
     min-width: var(--property-field-label-width);
 }
+
 #EnableColoredOutputInEditor Label, #EnableColoredOutputInEditor #unity-checkmark {
     font-size: 14px;
     height: 15px;
@@ -113,8 +143,8 @@
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 
-    height: 32px;
-    min-height: 32px;
+    height: 30px;
+    min-height: 30px;
 }
 
 #LogCategoriesListHeader Label {
@@ -133,6 +163,22 @@
     width: 200px;
     border-left-width: 1px;
     border-left-color: #222;
+}
+
+#LogCategoriesListHeader #category-list-header__sorting {
+    position: absolute;
+    right: 4px;
+    height: 16px;
+    width: 16px;
+}
+
+#LogCategoriesListHeader #category-list-header__sorting.ascending {
+    background-image: resource("d_icon dropdown@2x");
+    scale: 1 -1 1;
+}
+
+#LogCategoriesListHeader #category-list-header__sorting.descending {
+    background-image: resource("d_icon dropdown@2x");
 }
 
 #LogCategoriesListFooter {
@@ -184,4 +230,3 @@
     border-radius: 0;
     font-size: 13px;
 }
-
