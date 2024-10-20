@@ -14,38 +14,37 @@ namespace Vecerdi.Logging.Unity.Editor {
 
         private LoggingSettings LoggingSettings {
             get {
-                if (this.m_LoggingSettings == null) {
-                    this.m_LoggingSettings = LoggingSettings.GetOrCreateSettings();
+                if (m_LoggingSettings == null) {
+                    m_LoggingSettings = LoggingSettings.GetOrCreateSettings();
                 }
 
-                return this.m_LoggingSettings;
+                return m_LoggingSettings;
             }
         }
 
         private SerializedObject SerializedSettings {
             get {
-                if (this.m_SerializedSettings == null || this.m_SerializedSettings.targetObject != this.LoggingSettings) {
-                    this.m_SerializedSettings = new SerializedObject(this.LoggingSettings);
-                    this.m_SerializedSettings.Update();
+                if (m_SerializedSettings == null || m_SerializedSettings.targetObject != LoggingSettings) {
+                    m_SerializedSettings = new SerializedObject(LoggingSettings);
+                    m_SerializedSettings.Update();
                 }
 
-                return this.m_SerializedSettings;
+                return m_SerializedSettings;
             }
         }
 
         private static StyleSheet? s_StyleSheet;
 
         public LoggingSettingsProvider(string path, SettingsScope scopes = SettingsScope.Project, IEnumerable<string>? keywords = null)
-            : base(path, scopes, keywords) {
-        }
+            : base(path, scopes, keywords) { }
 
         public override void OnActivate(string searchContext, VisualElement rootElement) {
-            this.LoggingSettings.UpdateCategories();
-            this.SerializedSettings.Update();
+            LoggingSettings.UpdateCategories();
+            SerializedSettings.Update();
 
-            this.keywords = GetSearchKeywordsFromSerializedObject(this.SerializedSettings);
+            keywords = GetSearchKeywordsFromSerializedObject(SerializedSettings);
 
-            this.CreateUIElements(rootElement);
+            CreateUIElements(rootElement);
         }
 
         private void CreateUIElements(VisualElement rootElement) {
@@ -62,17 +61,17 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(title);
 
             VisualElement changeTracker = new();
-            changeTracker.TrackSerializedObjectValue(this.SerializedSettings, _ => this.LoggingSettings.Save());
+            changeTracker.TrackSerializedObjectValue(SerializedSettings, _ => LoggingSettings.Save());
             rootElement.Add(changeTracker);
 
-            SerializedProperty globalLogLevel = this.SerializedSettings.FindProperty("m_GlobalLogLevel");
+            var globalLogLevel = SerializedSettings.FindProperty("m_GlobalLogLevel");
             EnumField globalLogLevelField = new(globalLogLevel.displayName);
             globalLogLevelField.BindProperty(globalLogLevel);
             globalLogLevelField.name = "GlobalLogLevel";
             rootElement.Add(globalLogLevelField);
 
-            SerializedProperty overrideLogLevelInBuilds = this.SerializedSettings.FindProperty("m_OverrideGlobalLogLevelInBuilds");
-            SerializedProperty logLevelInBuilds = this.SerializedSettings.FindProperty("m_GlobalLogLevelInBuilds");
+            var overrideLogLevelInBuilds = SerializedSettings.FindProperty("m_OverrideGlobalLogLevelInBuilds");
+            var logLevelInBuilds = SerializedSettings.FindProperty("m_GlobalLogLevelInBuilds");
             VisualElement overrideContainer = new() { name = "OverrideLogLevelInBuildsContainer" };
 
             Toggle overrideLogLevelInBuildsToggle = new("Override in Builds");
@@ -92,14 +91,14 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             rootElement.Add(overrideContainer);
 
-            SerializedProperty categoryNameTransforms = this.SerializedSettings.FindProperty("m_CategoryNameTransforms");
+            var categoryNameTransforms = SerializedSettings.FindProperty("m_CategoryNameTransforms");
             EnumFlagsField categoryNameTransformsField = new(categoryNameTransforms.displayName);
             categoryNameTransformsField.BindProperty(categoryNameTransforms);
             categoryNameTransformsField.name = "CategoryNameTransforms";
-            categoryNameTransformsField.RegisterValueChangedCallback(_ => this.LoggingSettings.TransformAllCategoryNames());
+            categoryNameTransformsField.RegisterValueChangedCallback(_ => LoggingSettings.TransformAllCategoryNames());
             rootElement.Add(categoryNameTransformsField);
 
-            SerializedProperty enableColoredOutputInEditor = this.SerializedSettings.FindProperty("m_EnableColoredOutputInEditor");
+            var enableColoredOutputInEditor = SerializedSettings.FindProperty("m_EnableColoredOutputInEditor");
             Toggle enableColoredOutputInEditorToggle = new(enableColoredOutputInEditor.displayName);
             enableColoredOutputInEditorToggle.BindProperty(enableColoredOutputInEditor);
             enableColoredOutputInEditorToggle.name = "EnableColoredOutputInEditor";
@@ -108,12 +107,12 @@ namespace Vecerdi.Logging.Unity.Editor {
             Label logCategoriesLabel = new("Log Categories") { name = "LogCategoriesLabel" };
             rootElement.Add(logCategoriesLabel);
 
-            if (this.LoggingSettings.LogCategories.Count == 0) {
+            if (LoggingSettings.LogCategories.Count == 0) {
                 CreateExampleCodeElement(rootElement);
                 return;
             }
 
-            this.CreateLogCategoriesListView(rootElement);
+            CreateLogCategoriesListView(rootElement);
         }
 
         private void CreateLogCategoriesListView(VisualElement rootElement) {
@@ -129,7 +128,7 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             rootElement.Add(header);
 
-            SerializedProperty logCategories = this.SerializedSettings.FindProperty("m_LogCategories");
+            var logCategoriesProperty = SerializedSettings.FindProperty("m_LogCategories");
 
             // Create a new item template that mimics a multi-column layout
             Func<VisualElement> makeItem = () => {
@@ -155,14 +154,14 @@ namespace Vecerdi.Logging.Unity.Editor {
                 SerializedProperty logCategory = logCategories.GetArrayElementAtIndex(index);
 
                 // Bind the category name field
-                SerializedProperty logCategoryName = logCategory.FindPropertyRelative("m_CategoryName");
-                TextField categoryName = element.Q<TextField>(className: "category-list__category-name");
+                var logCategoryName = logCategory.FindPropertyRelative("m_CategoryName");
+                var categoryName = element.Q<TextField>(className: "category-list__category-name");
                 categoryName.BindProperty(logCategoryName);
                 categoryName.viewDataKey = logCategoryName.stringValue;
 
                 // Bind the log level field
-                SerializedProperty logCategoryLogLevel = logCategory.FindPropertyRelative("m_LogLevel");
-                EnumField logLevel = element.Q<EnumField>(className: "category-list__log-level");
+                var logCategoryLogLevel = logCategory.FindPropertyRelative("m_LogLevel");
+                var logLevel = element.Q<EnumField>(className: "category-list__log-level");
                 logLevel.BindProperty(logCategoryLogLevel);
                 logLevel.viewDataKey = logCategoryLogLevel.enumValueIndex.ToString();
             };
@@ -179,11 +178,10 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(logCategoriesListView);
 
             VisualElement footer = new() { name = "LogCategoriesListFooter" };
-            Label countLabel = new($"{this.LoggingSettings.LogCategories.Count} log categories");
+            Label countLabel = new($"{LoggingSettings.LogCategories.Count} log categories");
             footer.Add(countLabel);
             rootElement.Add(footer);
         }
-
 
         private static void CreateExampleCodeElement(VisualElement rootElement) {
             Label noCategoriesLabel = new("No log categories defined.\nDefine a log category in your code using the [LogCategory] attribute:") { name = "NoCategoriesLabel" };
@@ -199,7 +197,7 @@ namespace Vecerdi.Logging.Unity.Editor {
             ) {
                 name = "NoCategoriesCodeLabel",
             };
-            FontAsset robotoMonoRegularAsset = (FontAsset)EditorGUIUtility.Load("RobotoMono-Regular SDF");
+            var robotoMonoRegularAsset = (FontAsset)EditorGUIUtility.Load("RobotoMono-Regular SDF");
             noCategoriesCodeLabel.style.unityFontDefinition = new StyleFontDefinition(robotoMonoRegularAsset);
             noCategoriesCodeLabel.selection.isSelectable = true;
             rootElement.Add(noCategoriesCodeLabel);

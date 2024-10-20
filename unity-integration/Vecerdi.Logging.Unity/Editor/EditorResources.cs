@@ -10,14 +10,14 @@ namespace Vecerdi.Logging.Unity.Editor {
                 return true;
             }
 
-            string query = $"t:{typeof(T).Name} l:{tag} {assetName}";
+            var query = $"t:{typeof(T).Name} l:{tag} {assetName}";
             string[] guids = AssetDatabase.FindAssets(query);
             if (guids.Length == 0) {
                 Log.Error($"Could not find {typeof(T).Name} with tag {tag} and name {assetName}");
                 return false;
             }
 
-            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
             asset = AssetDatabase.LoadAssetAtPath<T>(path);
             return true;
         }
