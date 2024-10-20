@@ -129,6 +129,7 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(header);
 
             var logCategoriesProperty = SerializedSettings.FindProperty("m_LogCategories");
+            var logCategoriesList = new FilterableLogCategoryList(LoggingSettings.LogCategories);
 
             // Create a new item template that mimics a multi-column layout
             Func<VisualElement> makeItem = () => {
@@ -151,7 +152,8 @@ namespace Vecerdi.Logging.Unity.Editor {
             };
 
             Action<VisualElement, int> bindItem = (element, index) => {
-                SerializedProperty logCategory = logCategories.GetArrayElementAtIndex(index);
+                var originalIndex = logCategoriesList.GetOriginalIndex(index);
+                var logCategory = logCategoriesProperty.GetArrayElementAtIndex(originalIndex);
 
                 // Bind the category name field
                 var logCategoryName = logCategory.FindPropertyRelative("m_CategoryName");
@@ -170,8 +172,8 @@ namespace Vecerdi.Logging.Unity.Editor {
                 name = "LogCategoriesListView",
                 makeItem = makeItem,
                 bindItem = bindItem,
-                itemsSource = this.LoggingSettings.LogCategories,
                 showBoundCollectionSize = false,
+                itemsSource = logCategoriesList,
             };
 
             // Adjust the header margin based on the presence of the vertical scroller
@@ -182,6 +184,7 @@ namespace Vecerdi.Logging.Unity.Editor {
                 logLevelHeader.style.marginRight = view.verticalScroller.enabledSelf ? view.verticalScroller.resolvedStyle.width : 0;
             }, scrollView);
 
+            logCategoriesList.CollectionView = logCategoriesListView;
             logCategoriesListView.BindProperty(logCategoriesProperty);
             rootElement.Add(logCategoriesListView);
 
