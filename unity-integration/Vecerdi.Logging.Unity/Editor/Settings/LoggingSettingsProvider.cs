@@ -142,7 +142,6 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             rootElement.Add(header);
 
-
             // Create a new item template that mimics a multi-column layout
             Func<VisualElement> makeItem = () => {
                 // Create the container
@@ -190,10 +189,13 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(logCategoriesListView);
 
             logCategoriesList.CollectionView = logCategoriesListView;
-            logCategoriesList.SetSort(FilterableLogCategoryList.SortModes.Ascending, FilterableLogCategoryList.SortFields.CategoryName);
 
-            ApplySortVisuals(categoryNameSorting, FilterableLogCategoryList.SortModes.Ascending);
-            ApplySortVisuals(logLevelSorting, FilterableLogCategoryList.SortModes.None);
+            var sortModes = (FilterableLogCategoryList.SortModes)EditorPrefs.GetInt("Vecerdi.Logging.SortMode", (int)FilterableLogCategoryList.SortModes.None);
+            var sortFields = (FilterableLogCategoryList.SortFields)EditorPrefs.GetInt("Vecerdi.Logging.SortField", (int)FilterableLogCategoryList.SortFields.CategoryName);
+            logCategoriesList.SetSort(sortModes, sortFields);
+
+            ApplySortVisuals(categoryNameSorting, sortFields is FilterableLogCategoryList.SortFields.CategoryName ? sortModes : FilterableLogCategoryList.SortModes.None);
+            ApplySortVisuals(logLevelSorting, sortFields is FilterableLogCategoryList.SortFields.LogLevel ? sortModes : FilterableLogCategoryList.SortModes.None);
 
             // Adjust the header margin based on the presence of the vertical scroller
             var scrollView = (ScrollView)logCategoriesListView.hierarchy[0];
@@ -209,12 +211,16 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(footer);
 
             return;
+
             void HandleSortableClicked(FilterableLogCategoryList.SortFields field, VisualElement sortingElement, VisualElement otherSortingElement) {
                 var nextSortMode = GetNextSortMode(logCategoriesList.SortField == field ? logCategoriesList.SortMode : FilterableLogCategoryList.SortModes.None);
                 logCategoriesList.SetSort(nextSortMode, field);
 
                 ApplySortVisuals(sortingElement, nextSortMode);
                 ApplySortVisuals(otherSortingElement, FilterableLogCategoryList.SortModes.None);
+
+                EditorPrefs.SetInt("Vecerdi.Logging.SortMode", (int)nextSortMode);
+                EditorPrefs.SetInt("Vecerdi.Logging.SortField", (int)field);
             }
 
             void ApplySortVisuals(VisualElement sortingElement, FilterableLogCategoryList.SortModes sortMode) {
