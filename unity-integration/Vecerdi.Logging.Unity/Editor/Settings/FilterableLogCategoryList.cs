@@ -6,17 +6,16 @@ using UnityEngine.UIElements;
 
 namespace Vecerdi.Logging.Unity.Editor {
     public class FilterableLogCategoryList : IList<LogCategory>, IList {
+        public enum SortModes { None, Ascending, Descending }
+        public enum SortFields { CategoryName, LogLevel }
+
         private readonly List<LogCategory> m_OriginalList;
         private List<LogCategory> m_FilteredAndSortedList;
         private List<int> m_IndexMapping;
-
         private string m_FilterText = "";
-        private SortMode m_SortMode = SortMode.None;
-        private SortField m_SortField = SortField.CategoryName;
 
-        public enum SortMode { None, Ascending, Descending }
-        public enum SortField { CategoryName, LogLevel }
-
+        public SortModes SortMode { get; private set; } = SortModes.None;
+        public SortFields SortField { get; private set; } = SortFields.CategoryName;
         public BaseVerticalCollectionView CollectionView { get; set; }
 
         public FilterableLogCategoryList(List<LogCategory> originalList) {
@@ -31,10 +30,10 @@ namespace Vecerdi.Logging.Unity.Editor {
             }
         }
 
-        public void SetSort(SortMode sortMode, SortField sortField) {
-            if (m_SortMode != sortMode || m_SortField != sortField) {
-                m_SortMode = sortMode;
-                m_SortField = sortField;
+        public void SetSort(SortModes sortMode, SortFields sortField) {
+            if (SortMode != sortMode || SortField != sortField) {
+                SortMode = sortMode;
+                SortField = sortField;
                 RefreshFilteredAndSortedList();
             }
         }
@@ -53,12 +52,12 @@ namespace Vecerdi.Logging.Unity.Editor {
                 view = view.Where(tuple => tuple.LogCategory.CategoryName.Contains(m_FilterText, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (m_SortMode != SortMode.None) {
-                view = m_SortField == SortField.CategoryName
-                    ? m_SortMode == SortMode.Ascending
+            if (SortMode != SortModes.None) {
+                view = SortField == SortFields.CategoryName
+                    ? SortMode == SortModes.Ascending
                         ? view.OrderBy(t => t.LogCategory.CategoryName)
                         : view.OrderByDescending(t => t.LogCategory.CategoryName)
-                    : m_SortMode == SortMode.Ascending
+                    : SortMode == SortModes.Ascending
                         ? view.OrderBy(t => t.LogCategory.LogLevel)
                         : view.OrderByDescending(t => t.LogCategory.LogLevel);
             }

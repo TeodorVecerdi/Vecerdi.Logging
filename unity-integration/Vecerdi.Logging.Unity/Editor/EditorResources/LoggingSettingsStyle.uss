@@ -165,6 +165,22 @@
     border-left-color: #222;
 }
 
+#LogCategoriesListHeader #category-list-header__sorting {
+    position: absolute;
+    right: 4px;
+    height: 16px;
+    width: 16px;
+}
+
+#LogCategoriesListHeader #category-list-header__sorting.ascending {
+    background-image: resource("d_icon dropdown@2x");
+    scale: 1 -1 1;
+}
+
+#LogCategoriesListHeader #category-list-header__sorting.descending {
+    background-image: resource("d_icon dropdown@2x");
+}
+
 #LogCategoriesListFooter {
     flex-direction: row;
     justify-content: flex-end;

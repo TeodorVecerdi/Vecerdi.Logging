@@ -127,11 +127,18 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             Label categoryNameHeader = new("Category Name");
             categoryNameHeader.AddToClassList("category-list-header__category-name");
+            VisualElement categoryNameSorting = new() { name = "category-list-header__sorting" };
+            categoryNameHeader.Add(categoryNameSorting);
             header.Add(categoryNameHeader);
 
             Label logLevelHeader = new("Log Level");
             logLevelHeader.AddToClassList("category-list-header__log-level");
+            VisualElement logLevelSorting = new() { name = "category-list-header__sorting" };
+            logLevelHeader.Add(logLevelSorting);
             header.Add(logLevelHeader);
+
+            categoryNameHeader.AddManipulator(new Clickable(() => HandleSortableClicked(FilterableLogCategoryList.SortFields.CategoryName, categoryNameSorting, logLevelSorting)));
+            logLevelHeader.AddManipulator(new Clickable(() => HandleSortableClicked(FilterableLogCategoryList.SortFields.LogLevel, logLevelSorting, categoryNameSorting)));
 
             rootElement.Add(header);
 
@@ -183,6 +190,11 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(logCategoriesListView);
 
             logCategoriesList.CollectionView = logCategoriesListView;
+            logCategoriesList.SetSort(FilterableLogCategoryList.SortModes.Ascending, FilterableLogCategoryList.SortFields.CategoryName);
+
+            ApplySortVisuals(categoryNameSorting, FilterableLogCategoryList.SortModes.Ascending);
+            ApplySortVisuals(logLevelSorting, FilterableLogCategoryList.SortModes.None);
+
             // Adjust the header margin based on the presence of the vertical scroller
             var scrollView = (ScrollView)logCategoriesListView.hierarchy[0];
             scrollView.verticalScroller.RegisterCallback<GeometryChangedEvent, ScrollView>((_, view) => {
@@ -195,6 +207,31 @@ namespace Vecerdi.Logging.Unity.Editor {
             Label countLabel = new($"{LoggingSettings.LogCategories.Count} log categories");
             footer.Add(countLabel);
             rootElement.Add(footer);
+
+            return;
+            void HandleSortableClicked(FilterableLogCategoryList.SortFields field, VisualElement sortingElement, VisualElement otherSortingElement) {
+                var nextSortMode = GetNextSortMode(logCategoriesList.SortField == field ? logCategoriesList.SortMode : FilterableLogCategoryList.SortModes.None);
+                logCategoriesList.SetSort(nextSortMode, field);
+
+                ApplySortVisuals(sortingElement, nextSortMode);
+                ApplySortVisuals(otherSortingElement, FilterableLogCategoryList.SortModes.None);
+            }
+
+            void ApplySortVisuals(VisualElement sortingElement, FilterableLogCategoryList.SortModes sortMode) {
+                sortingElement.ClearClassList();
+                if (sortMode is not FilterableLogCategoryList.SortModes.None) {
+                    sortingElement.AddToClassList(sortMode is FilterableLogCategoryList.SortModes.Ascending ? "ascending" : "descending");
+                }
+            }
+
+            FilterableLogCategoryList.SortModes GetNextSortMode(FilterableLogCategoryList.SortModes currentMode) {
+                return currentMode switch {
+                    FilterableLogCategoryList.SortModes.None => FilterableLogCategoryList.SortModes.Ascending,
+                    FilterableLogCategoryList.SortModes.Ascending => FilterableLogCategoryList.SortModes.Descending,
+                    FilterableLogCategoryList.SortModes.Descending => FilterableLogCategoryList.SortModes.None,
+                    _ => throw new ArgumentOutOfRangeException(nameof(currentMode), currentMode, null),
+                };
+            }
         }
 
         private static void CreateExampleCodeElement(VisualElement rootElement) {
