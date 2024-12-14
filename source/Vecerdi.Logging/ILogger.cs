@@ -13,7 +13,7 @@ public interface ILogger {
     /// <param name="category">The category of the message.</param>
     /// <param name="context">The context of the message.</param>
     /// <param name="logLevel">The log level of the message.</param>
-    void Message(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Information);
+    void Message(ReadOnlySpan<char> message, ReadOnlySpan<char> category = default, object? context = null, LogLevel logLevel = LogLevel.Information);
 
     /// <summary>
     /// Logs an exception with the specified category, context and log level.
@@ -22,5 +22,5 @@ public interface ILogger {
     /// <param name="category">The category of the exception.</param>
     /// <param name="context">The context of the exception.</param>
     /// <param name="logLevel">The log level of the exception message.</param>
-    void Exception(Exception? exception, ReadOnlySpan<char> category = default, IContext? context = null, LogLevel logLevel = LogLevel.Error);
+    void Exception(Exception? exception, ReadOnlySpan<char> category = default, object? context = null, LogLevel logLevel = LogLevel.Error);
 }
