@@ -33,7 +33,7 @@ namespace Vecerdi.Logging.Unity {
         private UnityLogger() {}
 
         [HideInCallstack]
-        void ILogger.Message(ReadOnlySpan<char> message, ReadOnlySpan<char> category, IContext? context, LogLevel logLevel) {
+        void ILogger.Message(ReadOnlySpan<char> message, ReadOnlySpan<char> category, object? context, LogLevel logLevel) {
             Action<string,Object?> logMethod = logLevel switch {
                 LogLevel.Trace or LogLevel.Debug or LogLevel.Information => Debug.Log,
                 LogLevel.Warning => Debug.LogWarning,
@@ -49,17 +49,17 @@ namespace Vecerdi.Logging.Unity {
                         return;
                     }
 
-                    logMethod(GetLogMessage(message, logCategory.CategoryName, logLevel), (context as UnityContext)?.Context);
+                    logMethod(GetLogMessage(message, logCategory.CategoryName, logLevel), context as Object);
                 } else {
-                    logMethod(GetLogMessage(message, Settings.TransformCategoryName(category.ToString()), logLevel), (context as UnityContext)?.Context);
+                    logMethod(GetLogMessage(message, Settings.TransformCategoryName(category.ToString()), logLevel), context as Object);
                 }
             } else {
-                logMethod(GetLogMessage(message.ToString(), logLevel), (context as UnityContext)?.Context);
+                logMethod(GetLogMessage(message.ToString(), logLevel), context as Object);
             }
         }
 
         [HideInCallstack]
-        void ILogger.Exception(Exception? exception, ReadOnlySpan<char> category, IContext? context, LogLevel logLevel) {
+        void ILogger.Exception(Exception? exception, ReadOnlySpan<char> category, object? context, LogLevel logLevel) {
             if (!category.IsEmpty &&
                 Settings.LogCategoriesByName.TryGetValue(category.ToString(), out LogCategory? logCategory) &&
                 logLevel < logCategory.LogLevel
@@ -67,7 +67,7 @@ namespace Vecerdi.Logging.Unity {
                 return;
             }
 
-            Debug.LogException(exception, (context as UnityContext)?.Context);
+            Debug.LogException(exception, context as Object);
         }
 
 #if UNITY_EDITOR
