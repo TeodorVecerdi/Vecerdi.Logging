@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.Pool;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine.Pool;
+using System.Reflection;
 #endif
 
 namespace Vecerdi.Logging.Unity {
@@ -24,22 +24,23 @@ namespace Vecerdi.Logging.Unity {
         [SerializeField] private List<LogCategory> m_LogCategories = new();
         [SerializeField] private bool m_OverrideGlobalLogLevelInBuilds;
         [SerializeField] private LogLevel m_GlobalLogLevelInBuilds = LogLevel.Information;
+        [SerializeField] private bool m_LogMessagesOnMainThread;
 
         private bool m_IsDirty;
 
 #if UNITY_EDITOR
         public LogLevel GlobalLogLevel {
-            get => this.m_GlobalLogLevel;
-            set => this.m_GlobalLogLevel = value;
+            get => m_GlobalLogLevel;
+            set => m_GlobalLogLevel = value;
         }
 #else
         public LogLevel GlobalLogLevel {
-            get => this.m_OverrideGlobalLogLevelInBuilds ? this.m_GlobalLogLevelInBuilds : this.m_GlobalLogLevel;
+            get => m_OverrideGlobalLogLevelInBuilds ? m_GlobalLogLevelInBuilds : m_GlobalLogLevel;
             set {
-                if (this.m_OverrideGlobalLogLevelInBuilds) {
-                    this.m_GlobalLogLevelInBuilds = value;
+                if (m_OverrideGlobalLogLevelInBuilds) {
+                    m_GlobalLogLevelInBuilds = value;
                 } else {
-                    this.m_GlobalLogLevel = value;
+                    m_GlobalLogLevel = value;
                 }
             }
         }
@@ -55,18 +56,23 @@ namespace Vecerdi.Logging.Unity {
             set => m_GlobalLogLevelInBuilds = value;
         }
 
-        public List<LogCategory> LogCategories => this.m_LogCategories;
+        public List<LogCategory> LogCategories => m_LogCategories;
 
         public Dictionary<string, LogCategory> LogCategoriesByName { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
         public CategoryNameTransform CategoryNameTransforms {
-            get => this.m_CategoryNameTransforms;
-            set => this.m_CategoryNameTransforms = value;
+            get => m_CategoryNameTransforms;
+            set => m_CategoryNameTransforms = value;
         }
 
         public bool EnableColoredOutputInEditor {
-            get => this.m_EnableColoredOutputInEditor;
-            set => this.m_EnableColoredOutputInEditor = value;
+            get => m_EnableColoredOutputInEditor;
+            set => m_EnableColoredOutputInEditor = value;
+        }
+
+        public bool LogMessagesOnMainThread {
+            get => m_LogMessagesOnMainThread;
+            set => m_LogMessagesOnMainThread = value;
         }
 
         public void UpdateCategories() {
@@ -83,17 +89,17 @@ namespace Vecerdi.Logging.Unity {
                 string value = (fieldInfo.GetRawConstantValue() as string)!;
                 existingCategories.Add(value);
 
-                if (!this.ContainsCategoryWithName(value)) {
-                    string categoryName = this.TransformCategoryName(value);
-                    this.m_LogCategories.Add(new LogCategory(categoryName, value, attribute.DefaultLogLevel));
+                if (!ContainsCategoryWithName(value)) {
+                    string categoryName = TransformCategoryName(value);
+                    m_LogCategories.Add(new LogCategory(categoryName, value, attribute.DefaultLogLevel));
                     dirty = true;
                 }
             }
 
-            this.LogCategoriesByName = this.m_LogCategories.ToDictionary(logCategory => logCategory.OriginalCategoryName, logCategory => logCategory);
-            dirty |= this.m_LogCategories.RemoveAll(logCategory => !existingCategories.Contains(logCategory.OriginalCategoryName)) > 0;
+            LogCategoriesByName = m_LogCategories.ToDictionary(logCategory => logCategory.OriginalCategoryName, logCategory => logCategory);
+            dirty |= m_LogCategories.RemoveAll(logCategory => !existingCategories.Contains(logCategory.OriginalCategoryName)) > 0;
             if (dirty) {
-                this.Save();
+                Save();
             }
 #else
             this.LogCategoriesByName = this.m_LogCategories.ToDictionary(logCategory => logCategory.OriginalCategoryName, logCategory => logCategory);
@@ -101,11 +107,11 @@ namespace Vecerdi.Logging.Unity {
         }
 
         public bool ContainsCategoryWithName(string categoryName) {
-            return this.m_LogCategories.Any(logCategory => string.Equals(logCategory.OriginalCategoryName, categoryName, StringComparison.OrdinalIgnoreCase));
+            return m_LogCategories.Any(logCategory => string.Equals(logCategory.OriginalCategoryName, categoryName, StringComparison.OrdinalIgnoreCase));
         }
 
         public void Save() {
-            string json = JsonUtility.ToJson(this, true);
+            var json = JsonUtility.ToJson(this, true);
             DirectoryInfo directoryInfo = new(CustomProjectSettings.ProjectSettingsPath);
             if (!directoryInfo.Exists) {
                 directoryInfo.Create();
@@ -141,27 +147,27 @@ namespace Vecerdi.Logging.Unity {
         }
 
         public void TransformAllCategoryNames() {
-            foreach (LogCategory logCategory in this.m_LogCategories) {
-                logCategory.CategoryName = this.TransformCategoryName(logCategory.OriginalCategoryName);
+            foreach (var logCategory in m_LogCategories) {
+                logCategory.CategoryName = TransformCategoryName(logCategory.OriginalCategoryName);
             }
 
-            this.Save();
+            Save();
         }
 
         public string TransformCategoryName(string categoryName) {
-            if (this.m_CategoryNameTransforms.HasFlag(CategoryNameTransform.AllUppercase)) {
+            if (m_CategoryNameTransforms.HasFlag(CategoryNameTransform.AllUppercase)) {
                 categoryName = categoryName.ToUpperInvariant();
-            } else if (this.m_CategoryNameTransforms.HasFlag(CategoryNameTransform.AllLowercase)) {
+            } else if (m_CategoryNameTransforms.HasFlag(CategoryNameTransform.AllLowercase)) {
                 categoryName = categoryName.ToLowerInvariant();
             }
 
-            if (this.m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithUnderscores)) {
+            if (m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithUnderscores)) {
                 categoryName = categoryName.Replace(' ', '_');
-            } else if (this.m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithDashes)) {
+            } else if (m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithDashes)) {
                 categoryName = categoryName.Replace(' ', '-');
-            } else if (this.m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithDots)) {
+            } else if (m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithDots)) {
                 categoryName = categoryName.Replace(' ', '.');
-            } else if (this.m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithSlashes)) {
+            } else if (m_CategoryNameTransforms.HasFlag(CategoryNameTransform.ReplaceSpacesWithSlashes)) {
                 categoryName = categoryName.Replace(' ', '/');
             }
 
@@ -187,16 +193,16 @@ namespace Vecerdi.Logging.Unity {
         [SerializeField] private LogLevel m_LogLevel;
 
         public string CategoryName {
-            get => this.m_CategoryName;
-            set => this.m_CategoryName = value;
+            get => m_CategoryName;
+            set => m_CategoryName = value;
         }
-        public string OriginalCategoryName => this.m_OriginalCategoryName;
-        public LogLevel LogLevel => this.m_LogLevel;
+        public string OriginalCategoryName => m_OriginalCategoryName;
+        public LogLevel LogLevel => m_LogLevel;
 
         public LogCategory(string categoryName, string originalCategoryName, LogLevel logLevel) {
-            this.m_CategoryName = categoryName;
-            this.m_OriginalCategoryName = originalCategoryName;
-            this.m_LogLevel = logLevel;
+            m_CategoryName = categoryName;
+            m_OriginalCategoryName = originalCategoryName;
+            m_LogLevel = logLevel;
         }
     }
 }

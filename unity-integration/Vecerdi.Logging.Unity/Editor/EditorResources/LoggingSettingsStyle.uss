@@ -101,17 +101,17 @@
     font-size: 14px;
 }
 
-#EnableColoredOutputInEditor {
+.vecerdi-logging-toggle {
     margin-left: 0;
     height: 20px;
     align-items: center;
 }
 
-#EnableColoredOutputInEditor Label {
+.vecerdi-logging-toggle Label {
     min-width: var(--property-field-label-width);
 }
 
-#EnableColoredOutputInEditor Label, #EnableColoredOutputInEditor #unity-checkmark {
+.vecerdi-logging-toggle Label, .vecerdi-logging-toggle #unity-checkmark {
     font-size: 14px;
     height: 15px;
     width: 15px;

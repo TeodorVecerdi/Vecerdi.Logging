@@ -100,9 +100,17 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             var enableColoredOutputInEditor = SerializedSettings.FindProperty("m_EnableColoredOutputInEditor");
             Toggle enableColoredOutputInEditorToggle = new(enableColoredOutputInEditor.displayName);
+            enableColoredOutputInEditorToggle.AddToClassList("vecerdi-logging-toggle");
             enableColoredOutputInEditorToggle.BindProperty(enableColoredOutputInEditor);
             enableColoredOutputInEditorToggle.name = "EnableColoredOutputInEditor";
             rootElement.Add(enableColoredOutputInEditorToggle);
+
+            var logMessagesOnTheMainThread = SerializedSettings.FindProperty("m_LogMessagesOnMainThread");
+            Toggle logMessagesOnTheMainThreadToggle = new(logMessagesOnTheMainThread.displayName);
+            logMessagesOnTheMainThreadToggle.AddToClassList("vecerdi-logging-toggle");
+            logMessagesOnTheMainThreadToggle.BindProperty(logMessagesOnTheMainThread);
+            logMessagesOnTheMainThreadToggle.name = "LogMessagesOnMainThread";
+            rootElement.Add(logMessagesOnTheMainThreadToggle);
 
             Label logCategoriesLabel = new("Log Categories") { name = "LogCategoriesLabel" };
             rootElement.Add(logCategoriesLabel);
