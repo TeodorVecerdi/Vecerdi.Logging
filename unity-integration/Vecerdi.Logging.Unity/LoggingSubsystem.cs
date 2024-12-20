@@ -1,12 +1,26 @@
-﻿#if UNITY_EDITOR
+﻿#nullable enable
+
+using System.Threading;
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace Vecerdi.Logging.Unity {
     internal static partial class LoggingSubsystem {
-#if !UNITY_EDITOR
+        internal static class Threading {
+            internal static int MainThreadId { get; set; }
+            internal static SynchronizationContext? MainThread { get; set; }
+
+            internal static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == MainThreadId;
+        }
+
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-#endif
+        private static void Initialize() {
+            Threading.MainThreadId = Thread.CurrentThread.ManagedThreadId;
+            Threading.MainThread = SynchronizationContext.Current;
+            Register();
+        }
+
         private static void Register() {
             Log.RegisterLogger(UnityLogger.Instance);
         }
