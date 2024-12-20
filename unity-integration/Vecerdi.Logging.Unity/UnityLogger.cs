@@ -44,30 +44,51 @@ namespace Vecerdi.Logging.Unity {
             };
 
             if (!category.IsEmpty) {
-                if (Settings.LogCategoriesByName.TryGetValue(category.ToString(), out LogCategory? logCategory)) {
+                if (Settings.LogCategoriesByName.TryGetValue(category.ToString(), out var logCategory)) {
                     if (logLevel < logCategory.LogLevel) {
                         return;
                     }
 
-                    logMethod(GetLogMessage(message, logCategory.CategoryName, logLevel), context as Object);
+                    DoLogging(GetLogMessage(message, logCategory.CategoryName, logLevel), context as Object);
                 } else {
-                    logMethod(GetLogMessage(message, Settings.TransformCategoryName(category.ToString()), logLevel), context as Object);
+                    DoLogging(GetLogMessage(message, Settings.TransformCategoryName(category.ToString()), logLevel), context as Object);
                 }
             } else {
-                logMethod(GetLogMessage(message.ToString(), logLevel), context as Object);
+                DoLogging(GetLogMessage(message.ToString(), logLevel), context as Object);
+            }
+
+            return;
+
+            void DoLogging(string msg, Object? ctx) {
+                if (!LoggingSubsystem.Threading.IsMainThread && Settings.LogMessagesOnMainThread && Application.isPlaying) {
+                    LoggingSubsystem.Threading.MainThread?.Post(_ => logMethod(msg, ctx), null);
+                    return;
+                }
+
+                logMethod(msg, ctx);
             }
         }
 
         [HideInCallstack]
         void ILogger.Exception(Exception? exception, ReadOnlySpan<char> category, object? context, LogLevel logLevel) {
             if (!category.IsEmpty &&
-                Settings.LogCategoriesByName.TryGetValue(category.ToString(), out LogCategory? logCategory) &&
+                Settings.LogCategoriesByName.TryGetValue(category.ToString(), out var logCategory) &&
                 logLevel < logCategory.LogLevel
             ) {
                 return;
             }
 
-            Debug.LogException(exception, context as Object);
+            DoLogging(exception, context as Object);
+            return;
+
+            void DoLogging(Exception? ex, Object? ctx) {
+                if (!LoggingSubsystem.Threading.IsMainThread && Settings.LogMessagesOnMainThread && Application.isPlaying) {
+                    LoggingSubsystem.Threading.MainThread?.Post(_ => Debug.LogException(ex, ctx), null);
+                    return;
+                }
+
+                Debug.LogException(ex, ctx);
+            }
         }
 
 #if UNITY_EDITOR
