@@ -1,5 +1,6 @@
 ﻿namespace Vecerdi.Logging;
 
+[System.Obsolete("Use Microsoft.Extensions.Logging.ILogger instead. This interface will be removed in a future version.", false)]
 public interface ILogger {
     /// <summary>
     /// The minimum log level to log.

@@ -1,5 +1,6 @@
 ﻿namespace Vecerdi.Logging;
 
+[System.Obsolete("Use Microsoft.Extensions.Logging with ConsoleLoggerProvider instead. This class will be removed in a future version.", false)]
 internal class ConsoleLogger : ILogger {
     /// <summary>
     /// The minimum log level to log.

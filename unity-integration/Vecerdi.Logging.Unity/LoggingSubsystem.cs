@@ -22,6 +22,7 @@ namespace Vecerdi.Logging.Unity {
         }
 
         private static void Register() {
+            // Register with the legacy system for backwards compatibility
             Log.RegisterLogger(UnityLogger.Instance);
         }
     }

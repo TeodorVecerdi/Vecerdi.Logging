@@ -2,6 +2,7 @@
 
 namespace Vecerdi.Logging;
 
+[System.Obsolete("Use Microsoft.Extensions.Logging instead. This class will be removed in a future version.", false)]
 public static class Log {
     private static readonly HashSet<ILogger> s_Loggers = new();
 
