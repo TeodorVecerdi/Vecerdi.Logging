@@ -63,12 +63,7 @@ namespace Vecerdi.Logging.Extensions {
         /// <param name="logLevel">Level to be checked.</param>
         /// <returns>true if enabled; false otherwise.</returns>
         public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel) {
-            if (logLevel == Microsoft.Extensions.Logging.LogLevel.None) {
-                return false;
-            }
-
-            var vecerdiLogLevel = ConvertToVecerdiLogLevel(logLevel);
-            return vecerdiLogLevel >= Vecerdi.Logging.Log.DefaultLogger.MinimumLogLevel;
+            return logLevel != Microsoft.Extensions.Logging.LogLevel.None;
         }
 
         /// <summary>

@@ -15,16 +15,5 @@ namespace Vecerdi.Logging.Extensions {
             factory.AddProvider(new VecerdiLoggerProvider());
             return factory;
         }
-
-        /// <summary>
-        /// Adds Unity logging support to the logger factory.
-        /// This routes Microsoft.Extensions.Logging calls directly to Unity's Debug.Log* methods.
-        /// </summary>
-        /// <param name="factory">The logger factory.</param>
-        /// <returns>The logger factory for chaining.</returns>
-        public static ILoggerFactory AddUnity(this ILoggerFactory factory) {
-            factory.AddProvider(Unity.UnityLoggerProvider.Instance);
-            return factory;
-        }
     }
 }

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using UnityEngine;
 
 namespace Vecerdi.Logging.Unity {
     /// <summary>
     /// Logger provider that routes Microsoft.Extensions.Logging calls to Unity's Debug.Log* methods.
-    /// This class is designed to be used in environments where both Microsoft.Extensions.Logging 
-    /// and Unity are available.
+    /// This class directly references Unity assemblies and does not use reflection.
     /// </summary>
     public class UnityLoggerProvider : ILoggerProvider {
         private readonly ConcurrentDictionary<string, UnityMsLogger> _loggers = new();
@@ -45,7 +45,7 @@ namespace Vecerdi.Logging.Unity {
 
     /// <summary>
     /// Microsoft.Extensions.Logging.ILogger implementation that routes logs to Unity's Debug.Log* methods.
-    /// This implementation assumes Unity is available and directly calls Unity methods.
+    /// This implementation directly calls Unity methods without reflection.
     /// </summary>
     internal class UnityMsLogger : Microsoft.Extensions.Logging.ILogger {
         private readonly string _categoryName;
@@ -107,44 +107,26 @@ namespace Vecerdi.Logging.Unity {
                 case Microsoft.Extensions.Logging.LogLevel.Debug:
                 case Microsoft.Extensions.Logging.LogLevel.Information:
                     if (exception != null) {
-                        // Use reflection to call UnityEngine.Debug.LogException
-                        CallUnityDebugMethod("LogException", exception);
+                        Debug.LogException(exception);
                     } else {
-                        // Use reflection to call UnityEngine.Debug.Log
-                        CallUnityDebugMethod("Log", logMessage);
+                        Debug.Log(logMessage);
                     }
                     break;
                 case Microsoft.Extensions.Logging.LogLevel.Warning:
                     if (exception != null) {
-                        CallUnityDebugMethod("LogWarning", logMessage + Environment.NewLine + exception);
+                        Debug.LogWarning(logMessage + Environment.NewLine + exception);
                     } else {
-                        CallUnityDebugMethod("LogWarning", logMessage);
+                        Debug.LogWarning(logMessage);
                     }
                     break;
                 case Microsoft.Extensions.Logging.LogLevel.Error:
                 case Microsoft.Extensions.Logging.LogLevel.Critical:
                     if (exception != null) {
-                        CallUnityDebugMethod("LogException", exception);
+                        Debug.LogException(exception);
                     } else {
-                        CallUnityDebugMethod("LogError", logMessage);
+                        Debug.LogError(logMessage);
                     }
                     break;
-            }
-        }
-
-        private static void CallUnityDebugMethod(string methodName, object message) {
-            try {
-                // Use reflection to find and call Unity's Debug methods
-                // This allows the code to work even when Unity assemblies aren't directly referenced
-                var unityDebugType = Type.GetType("UnityEngine.Debug, UnityEngine.CoreModule");
-                if (unityDebugType != null) {
-                    var method = unityDebugType.GetMethod(methodName, new[] { message.GetType() });
-                    method?.Invoke(null, new[] { message });
-                }
-            }
-            catch {
-                // If Unity isn't available, fall back to console
-                Console.WriteLine($"[Unity] {message}");
             }
         }
 
