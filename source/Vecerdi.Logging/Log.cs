@@ -29,7 +29,7 @@ public static class Log {
 
     // Legacy support for backwards compatibility - marked as obsolete
 #pragma warning disable CS0618 // Type or member is obsolete
-    private static readonly HashSet<ILogger> s_LegacyLoggers = new();
+    internal static readonly HashSet<ILogger> s_LegacyLoggers = new();
 
 #pragma warning disable CS0618 // Type or member is obsolete
     [System.Obsolete("Use LoggerFactory property instead. This property will be removed in a future version.", false)]

@@ -37,7 +37,8 @@ namespace Vecerdi.Logging.Extensions {
     }
 
     /// <summary>
-    /// Microsoft.Extensions.Logging.ILogger implementation that routes logs to Vecerdi.Logging.Log.
+    /// Microsoft.Extensions.Logging.ILogger implementation that routes logs to Vecerdi.Logging system.
+    /// This implementation routes directly to legacy loggers to avoid circular dependencies.
     /// </summary>
     internal class VecerdiLogger : Microsoft.Extensions.Logging.ILogger {
         private readonly string _categoryName;
@@ -92,15 +93,38 @@ namespace Vecerdi.Logging.Extensions {
 
             var vecerdiLogLevel = ConvertToVecerdiLogLevel(logLevel);
             
+            // Route directly to legacy logger system to avoid circular dependencies
+#pragma warning disable CS0618 // Type or member is obsolete
             // Log the message
             if (!string.IsNullOrEmpty(message)) {
-                Vecerdi.Logging.Log.Message(message.AsSpan(), _categoryName.AsSpan(), null, vecerdiLogLevel);
+                if (Vecerdi.Logging.Log.s_LegacyLoggers.Count == 0) {
+                    if (vecerdiLogLevel >= Vecerdi.Logging.Log.DefaultLogger.MinimumLogLevel) {
+                        Vecerdi.Logging.Log.DefaultLogger.Message(message.AsSpan(), _categoryName.AsSpan(), null, vecerdiLogLevel);
+                    }
+                } else {
+                    foreach (ILogger logger in Vecerdi.Logging.Log.s_LegacyLoggers) {
+                        if (vecerdiLogLevel >= logger.MinimumLogLevel) {
+                            logger.Message(message.AsSpan(), _categoryName.AsSpan(), null, vecerdiLogLevel);
+                        }
+                    }
+                }
             }
 
             // Log the exception if present
             if (exception != null) {
-                Vecerdi.Logging.Log.Exception(exception, _categoryName.AsSpan(), null, vecerdiLogLevel);
+                if (Vecerdi.Logging.Log.s_LegacyLoggers.Count == 0) {
+                    if (vecerdiLogLevel >= Vecerdi.Logging.Log.DefaultLogger.MinimumLogLevel) {
+                        Vecerdi.Logging.Log.DefaultLogger.Exception(exception, _categoryName.AsSpan(), null, vecerdiLogLevel);
+                    }
+                } else {
+                    foreach (ILogger logger in Vecerdi.Logging.Log.s_LegacyLoggers) {
+                        if (vecerdiLogLevel >= logger.MinimumLogLevel) {
+                            logger.Exception(exception, _categoryName.AsSpan(), null, vecerdiLogLevel);
+                        }
+                    }
+                }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private static LogLevel ConvertToVecerdiLogLevel(Microsoft.Extensions.Logging.LogLevel logLevel) {
