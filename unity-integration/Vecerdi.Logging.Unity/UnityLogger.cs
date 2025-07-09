@@ -60,7 +60,7 @@ namespace Vecerdi.Logging.Unity {
             return;
 
             void DoLogging(string msg, Object? ctx) {
-                if (!LoggingSubsystem.Threading.IsMainThread && Settings.LogMessagesOnMainThread && Application.isPlaying) {
+                if (!LoggingSubsystem.Threading.IsMainThread && Settings.LogMessagesOnMainThread && LoggingSubsystem.Threading.IsPlaying) {
                     LoggingSubsystem.Threading.MainThread?.Post(_ => logMethod(msg, ctx), null);
                     return;
                 }
@@ -82,7 +82,7 @@ namespace Vecerdi.Logging.Unity {
             return;
 
             void DoLogging(Exception? ex, Object? ctx) {
-                if (!LoggingSubsystem.Threading.IsMainThread && Settings.LogMessagesOnMainThread && Application.isPlaying) {
+                if (!LoggingSubsystem.Threading.IsMainThread && Settings.LogMessagesOnMainThread && LoggingSubsystem.Threading.IsPlaying) {
                     LoggingSubsystem.Threading.MainThread?.Post(_ => Debug.LogException(ex, ctx), null);
                     return;
                 }

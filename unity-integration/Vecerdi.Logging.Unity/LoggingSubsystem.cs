@@ -10,6 +10,7 @@ namespace Vecerdi.Logging.Unity {
         internal static class Threading {
             internal static int MainThreadId { get; set; }
             internal static SynchronizationContext? MainThread { get; set; }
+            internal static bool IsPlaying { get; set; }
 
             internal static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == MainThreadId;
         }
@@ -18,6 +19,7 @@ namespace Vecerdi.Logging.Unity {
         private static void Initialize() {
             Threading.MainThreadId = Thread.CurrentThread.ManagedThreadId;
             Threading.MainThread = SynchronizationContext.Current;
+            Threading.IsPlaying = true;
             Register();
         }
 
@@ -37,6 +39,7 @@ namespace Vecerdi.Logging.Unity {
 
         private static void RegisterWhenExitingPlayMode(PlayModeStateChange state) {
             if (state is PlayModeStateChange.EnteredEditMode) {
+                Threading.IsPlaying = false;
                 Register();
             }
         }
