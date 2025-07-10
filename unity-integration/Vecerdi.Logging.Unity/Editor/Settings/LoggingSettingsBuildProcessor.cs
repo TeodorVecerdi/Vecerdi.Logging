@@ -69,7 +69,7 @@ namespace Vecerdi.Logging.Unity {{
             var generatedPath = Path.Combine(Application.dataPath, "Generated", "Vecerdi.Logging");
             if (Directory.Exists(generatedPath)) {
                 Directory.Delete(generatedPath, true);
-                
+
                 // Delete meta files
                 var metaPath = $"{generatedPath}.meta";
                 if (File.Exists(metaPath)) {
