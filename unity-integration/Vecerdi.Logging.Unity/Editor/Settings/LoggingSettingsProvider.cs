@@ -10,15 +10,6 @@ using UnityEngine.UIElements;
 
 namespace Vecerdi.Logging.Unity.Editor {
     // A ScriptableObject wrapper to enable Unity's SerializedObject functionality
-    internal class LoggingSettingsWrapper : ScriptableObject {
-        [SerializeField] private LoggingSettingsData m_Data = new();
-        
-        public LoggingSettingsData Data => m_Data;
-        
-        public void SetData(LoggingSettingsData data) {
-            m_Data = data;
-        }
-    }
 
     public class LoggingSettingsProvider : SettingsProvider {
         private LoggingSettings? m_LoggingSettings;
