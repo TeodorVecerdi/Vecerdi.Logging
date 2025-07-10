@@ -162,6 +162,11 @@ namespace Vecerdi.Logging.Unity {
             return s_Instance;
         }
 
+        // Internal method for testing purposes only
+        internal static void _ResetInstance() {
+            s_Instance = null;
+        }
+
         public void TransformAllCategoryNames() {
             foreach (var logCategory in m_Data.LogCategories) {
                 logCategory.CategoryName = TransformCategoryName(logCategory.OriginalCategoryName);
