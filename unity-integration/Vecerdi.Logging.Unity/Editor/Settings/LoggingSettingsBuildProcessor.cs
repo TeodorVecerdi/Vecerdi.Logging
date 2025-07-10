@@ -15,18 +15,22 @@ namespace Vecerdi.Logging.Unity.Editor {
             var settings = LoggingSettings.GetOrCreateSettings();
             settings.UpdateCategories();
 
-            var resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
-            if (!Directory.Exists(resourcesPath)) {
-                Directory.CreateDirectory(resourcesPath);
+            // Copy JSON settings file to StreamingAssets
+            var streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets", "Vecerdi.Logging");
+            if (!Directory.Exists(streamingAssetsPath)) {
+                Directory.CreateDirectory(streamingAssetsPath);
             }
 
-            var destinationPath = Path.Combine(resourcesPath, LoggingSettings.ASSET_NAME);
+            var destinationPath = Path.Combine(streamingAssetsPath, LoggingSettings.SETTINGS_FILE_NAME);
             if (File.Exists(destinationPath)) {
                 File.Delete(destinationPath);
             }
 
-            var relativePath = Path.Combine("Assets", "Resources", "Vecerdi.Logging", LoggingSettings.ASSET_NAME);
-            AssetDatabase.CreateAsset(settings, relativePath);
+            // Copy the JSON file
+            if (File.Exists(LoggingSettings.LoggingSettingsPath)) {
+                File.Copy(LoggingSettings.LoggingSettingsPath, destinationPath);
+            }
+
             AssetDatabase.Refresh();
         }
     }
@@ -35,21 +39,21 @@ namespace Vecerdi.Logging.Unity.Editor {
         public int callbackOrder => 0;
 
         public void OnPostprocessBuild(BuildReport report) {
-            var resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
-            var assetPath = Path.Combine(resourcesPath, LoggingSettings.ASSET_NAME);
+            var streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets", "Vecerdi.Logging");
+            var settingsPath = Path.Combine(streamingAssetsPath, LoggingSettings.SETTINGS_FILE_NAME);
 
-            if (File.Exists(assetPath)) {
-                File.Delete(assetPath);
-                File.Delete($"{assetPath}.meta");
+            if (File.Exists(settingsPath)) {
+                File.Delete(settingsPath);
+                File.Delete($"{settingsPath}.meta");
             }
 
-            if (!Directory.EnumerateFiles(resourcesPath).Any()) {
-                Directory.Delete(resourcesPath);
-                File.Delete($"{resourcesPath}.meta");
+            if (Directory.Exists(streamingAssetsPath) && !Directory.EnumerateFiles(streamingAssetsPath).Any()) {
+                Directory.Delete(streamingAssetsPath);
+                File.Delete($"{streamingAssetsPath}.meta");
             }
 
-            var parentDirectory = Directory.GetParent(resourcesPath)!.FullName;
-            if (!Directory.EnumerateFiles(parentDirectory).Any()) {
+            var parentDirectory = Directory.GetParent(streamingAssetsPath)!.FullName;
+            if (Directory.Exists(parentDirectory) && !Directory.EnumerateFiles(parentDirectory).Any()) {
                 Directory.Delete(parentDirectory);
                 File.Delete($"{parentDirectory}.meta");
             }

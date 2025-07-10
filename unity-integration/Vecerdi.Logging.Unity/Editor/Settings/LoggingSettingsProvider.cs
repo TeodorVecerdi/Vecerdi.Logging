@@ -4,12 +4,25 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 namespace Vecerdi.Logging.Unity.Editor {
+    // A ScriptableObject wrapper to enable Unity's SerializedObject functionality
+    internal class LoggingSettingsWrapper : ScriptableObject {
+        [SerializeField] private LoggingSettingsData m_Data = new();
+        
+        public LoggingSettingsData Data => m_Data;
+        
+        public void SetData(LoggingSettingsData data) {
+            m_Data = data;
+        }
+    }
+
     public class LoggingSettingsProvider : SettingsProvider {
         private LoggingSettings? m_LoggingSettings;
+        private LoggingSettingsWrapper? m_SettingsWrapper;
         private SerializedObject? m_SerializedSettings;
 
         private LoggingSettings LoggingSettings {
@@ -24,8 +37,12 @@ namespace Vecerdi.Logging.Unity.Editor {
 
         private SerializedObject SerializedSettings {
             get {
-                if (m_SerializedSettings == null || m_SerializedSettings.targetObject != LoggingSettings) {
-                    m_SerializedSettings = new SerializedObject(LoggingSettings);
+                if (m_SerializedSettings == null || m_SettingsWrapper == null) {
+                    if (m_SettingsWrapper == null) {
+                        m_SettingsWrapper = CreateInstance<LoggingSettingsWrapper>();
+                    }
+                    m_SettingsWrapper.SetData(LoggingSettings.GetSerializableData());
+                    m_SerializedSettings = new SerializedObject(m_SettingsWrapper);
                     m_SerializedSettings.Update();
                 }
 
@@ -40,6 +57,12 @@ namespace Vecerdi.Logging.Unity.Editor {
 
         public override void OnActivate(string searchContext, VisualElement rootElement) {
             LoggingSettings.UpdateCategories();
+            
+            // Refresh the wrapper with current data
+            if (m_SettingsWrapper != null) {
+                m_SettingsWrapper.SetData(LoggingSettings.GetSerializableData());
+            }
+            
             SerializedSettings.Update();
 
             keywords = GetSearchKeywordsFromSerializedObject(SerializedSettings);
@@ -61,17 +84,34 @@ namespace Vecerdi.Logging.Unity.Editor {
             rootElement.Add(title);
 
             VisualElement changeTracker = new();
-            changeTracker.TrackSerializedObjectValue(SerializedSettings, _ => LoggingSettings.Save());
+            changeTracker.TrackSerializedObjectValue(SerializedSettings, _ => {
+                // Update the actual LoggingSettings with the serialized data
+                var data = m_SettingsWrapper!.Data;
+                var settings = LoggingSettings;
+                settings.GlobalLogLevel = data.GlobalLogLevel;
+                settings.CategoryNameTransforms = data.CategoryNameTransforms;
+                settings.EnableColoredOutputInEditor = data.EnableColoredOutputInEditor;
+                settings.OverrideGlobalLogLevelInBuilds = data.OverrideGlobalLogLevelInBuilds;
+                settings.GlobalLogLevelInBuilds = data.GlobalLogLevelInBuilds;
+                settings.LogMessagesOnMainThread = data.LogMessagesOnMainThread;
+                
+                // Update categories - more complex since it's a list
+                settings.LogCategories.Clear();
+                settings.LogCategories.AddRange(data.LogCategories);
+                
+                settings.Save();
+            });
             rootElement.Add(changeTracker);
 
-            var globalLogLevel = SerializedSettings.FindProperty("m_GlobalLogLevel");
+            var globalLogLevel = SerializedSettings.FindProperty("m_Data").FindPropertyRelative("GlobalLogLevel");
             EnumField globalLogLevelField = new(globalLogLevel.displayName);
             globalLogLevelField.BindProperty(globalLogLevel);
             globalLogLevelField.name = "GlobalLogLevel";
             rootElement.Add(globalLogLevelField);
 
-            var overrideLogLevelInBuilds = SerializedSettings.FindProperty("m_OverrideGlobalLogLevelInBuilds");
-            var logLevelInBuilds = SerializedSettings.FindProperty("m_GlobalLogLevelInBuilds");
+            var dataProperty = SerializedSettings.FindProperty("m_Data");
+            var overrideLogLevelInBuilds = dataProperty.FindPropertyRelative("OverrideGlobalLogLevelInBuilds");
+            var logLevelInBuilds = dataProperty.FindPropertyRelative("GlobalLogLevelInBuilds");
             VisualElement overrideContainer = new() { name = "OverrideLogLevelInBuildsContainer" };
 
             Toggle overrideLogLevelInBuildsToggle = new("Override in Builds");
@@ -91,21 +131,21 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             rootElement.Add(overrideContainer);
 
-            var categoryNameTransforms = SerializedSettings.FindProperty("m_CategoryNameTransforms");
+            var categoryNameTransforms = dataProperty.FindPropertyRelative("CategoryNameTransforms");
             EnumFlagsField categoryNameTransformsField = new(categoryNameTransforms.displayName);
             categoryNameTransformsField.BindProperty(categoryNameTransforms);
             categoryNameTransformsField.name = "CategoryNameTransforms";
             categoryNameTransformsField.RegisterValueChangedCallback(_ => LoggingSettings.TransformAllCategoryNames());
             rootElement.Add(categoryNameTransformsField);
 
-            var enableColoredOutputInEditor = SerializedSettings.FindProperty("m_EnableColoredOutputInEditor");
+            var enableColoredOutputInEditor = dataProperty.FindPropertyRelative("EnableColoredOutputInEditor");
             Toggle enableColoredOutputInEditorToggle = new(enableColoredOutputInEditor.displayName);
             enableColoredOutputInEditorToggle.AddToClassList("vecerdi-logging-toggle");
             enableColoredOutputInEditorToggle.BindProperty(enableColoredOutputInEditor);
             enableColoredOutputInEditorToggle.name = "EnableColoredOutputInEditor";
             rootElement.Add(enableColoredOutputInEditorToggle);
 
-            var logMessagesOnTheMainThread = SerializedSettings.FindProperty("m_LogMessagesOnMainThread");
+            var logMessagesOnTheMainThread = dataProperty.FindPropertyRelative("LogMessagesOnMainThread");
             Toggle logMessagesOnTheMainThreadToggle = new(logMessagesOnTheMainThread.displayName);
             logMessagesOnTheMainThreadToggle.AddToClassList("vecerdi-logging-toggle");
             logMessagesOnTheMainThreadToggle.BindProperty(logMessagesOnTheMainThread);
@@ -125,7 +165,7 @@ namespace Vecerdi.Logging.Unity.Editor {
 
         private void CreateLogCategoriesListView(VisualElement rootElement) {
             var logCategoriesList = new FilterableLogCategoryList(LoggingSettings.LogCategories);
-            var logCategoriesProperty = SerializedSettings.FindProperty("m_LogCategories");
+            var logCategoriesProperty = SerializedSettings.FindProperty("m_Data").FindPropertyRelative("LogCategories");
 
             ToolbarSearchField searchField = new() { name = "LogCategoriesSearchField" };
             searchField.RegisterValueChangedCallback(evt => logCategoriesList.SetFilter(evt.newValue));
