@@ -30,8 +30,9 @@ namespace Vecerdi.Logging.Unity.Editor {
             get {
                 if (m_SerializedSettings == null || m_SettingsWrapper == null) {
                     if (m_SettingsWrapper == null) {
-                        m_SettingsWrapper = CreateInstance<LoggingSettingsWrapper>();
+                        m_SettingsWrapper = ScriptableObject.CreateInstance<LoggingSettingsWrapper>();
                     }
+
                     m_SettingsWrapper.SetData(LoggingSettings.GetSerializableData());
                     m_SerializedSettings = new SerializedObject(m_SettingsWrapper);
                     m_SerializedSettings.Update();
@@ -48,12 +49,12 @@ namespace Vecerdi.Logging.Unity.Editor {
 
         public override void OnActivate(string searchContext, VisualElement rootElement) {
             LoggingSettings.UpdateCategories();
-            
+
             // Refresh the wrapper with current data
             if (m_SettingsWrapper != null) {
                 m_SettingsWrapper.SetData(LoggingSettings.GetSerializableData());
             }
-            
+
             SerializedSettings.Update();
 
             keywords = GetSearchKeywordsFromSerializedObject(SerializedSettings);
@@ -85,11 +86,11 @@ namespace Vecerdi.Logging.Unity.Editor {
                 settings.OverrideGlobalLogLevelInBuilds = data.OverrideGlobalLogLevelInBuilds;
                 settings.GlobalLogLevelInBuilds = data.GlobalLogLevelInBuilds;
                 settings.LogMessagesOnMainThread = data.LogMessagesOnMainThread;
-                
+
                 // Update categories - more complex since it's a list
                 settings.LogCategories.Clear();
                 settings.LogCategories.AddRange(data.LogCategories);
-                
+
                 settings.Save();
             });
             rootElement.Add(changeTracker);
