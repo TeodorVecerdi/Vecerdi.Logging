@@ -143,10 +143,11 @@ namespace Vecerdi.Logging.Unity {
                 s_Instance.Save();
             }
 #else
-            // In builds, try StreamingAssets first, then fallback to Resources folder
-            var settingsAsset = Resources.Load<TextAsset>("Vecerdi.Logging/LoggingSettings");
-            if (settingsAsset != null) {
-                JsonUtility.FromJsonOverwrite(settingsAsset.text, s_Instance.m_Data);
+            // In builds, load from generated embedded configuration
+            try {
+                JsonUtility.FromJsonOverwrite(GeneratedLoggingConfiguration.EmbeddedJson, s_Instance.m_Data);
+            } catch (System.Exception e) {
+                Debug.LogWarning($"Failed to load embedded logging configuration: {e.Message}");
             }
 #endif
             s_Instance.UpdateCategories();

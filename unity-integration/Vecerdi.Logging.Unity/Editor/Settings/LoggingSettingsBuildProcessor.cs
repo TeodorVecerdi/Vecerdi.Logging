@@ -15,21 +15,47 @@ namespace Vecerdi.Logging.Unity.Editor {
             var settings = LoggingSettings.GetOrCreateSettings();
             settings.UpdateCategories();
 
-            // Copy JSON settings file to StreamingAssets
-            var resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
-            if (!Directory.Exists(resourcesPath)) {
-                Directory.CreateDirectory(resourcesPath);
+            // Generate embedded configuration class instead of copying to Resources
+            GenerateEmbeddedConfiguration();
+        }
+
+        private void GenerateEmbeddedConfiguration() {
+            // Create the Generated folder if it doesn't exist
+            var generatedPath = Path.Combine(Application.dataPath, "Generated");
+            if (!Directory.Exists(generatedPath)) {
+                Directory.CreateDirectory(generatedPath);
             }
 
-            var destinationPath = Path.Combine(resourcesPath, LoggingSettings.SETTINGS_FILE_NAME);
-            if (File.Exists(destinationPath)) {
-                File.Delete(destinationPath);
+            var loggingGeneratedPath = Path.Combine(generatedPath, "Vecerdi.Logging");
+            if (!Directory.Exists(loggingGeneratedPath)) {
+                Directory.CreateDirectory(loggingGeneratedPath);
             }
 
-            // Copy the JSON file
+            // Read the JSON configuration
+            string json = "{}";
             if (File.Exists(LoggingSettings.LoggingSettingsPath)) {
-                File.Copy(LoggingSettings.LoggingSettingsPath, destinationPath);
+                json = File.ReadAllText(LoggingSettings.LoggingSettingsPath);
             }
+
+            // Generate the C# class using verbatim string literal
+            var classContent = $@"// This file is auto-generated during build. Do not modify manually.
+#nullable enable
+
+namespace Vecerdi.Logging.Unity {{
+    internal static class GeneratedLoggingConfiguration {{
+        public const string EmbeddedJson = @""{json.Replace("\"", "\"\"")}"";
+    }}
+}}";
+
+            var classPath = Path.Combine(loggingGeneratedPath, "GeneratedLoggingConfiguration.cs");
+            File.WriteAllText(classPath, classContent);
+
+            // Create asmref file to include this in the Vecerdi.Logging.Unity assembly
+            var asmrefContent = @"{
+    ""reference"": ""Vecerdi.Logging.Unity""
+}";
+            var asmrefPath = Path.Combine(loggingGeneratedPath, "Vecerdi.Logging.Unity.asmref");
+            File.WriteAllText(asmrefPath, asmrefContent);
 
             AssetDatabase.Refresh();
         }
@@ -39,23 +65,26 @@ namespace Vecerdi.Logging.Unity.Editor {
         public int callbackOrder => 0;
 
         public void OnPostprocessBuild(BuildReport report) {
-            var resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
-            var settingsPath = Path.Combine(resourcesPath, LoggingSettings.SETTINGS_FILE_NAME);
+            // Clean up generated files after build
+            var generatedPath = Path.Combine(Application.dataPath, "Generated", "Vecerdi.Logging");
+            if (Directory.Exists(generatedPath)) {
+                Directory.Delete(generatedPath, true);
+                
+                // Delete meta files
+                var metaPath = $"{generatedPath}.meta";
+                if (File.Exists(metaPath)) {
+                    File.Delete(metaPath);
+                }
 
-            if (File.Exists(settingsPath)) {
-                File.Delete(settingsPath);
-                File.Delete($"{settingsPath}.meta");
-            }
-
-            if (Directory.Exists(resourcesPath) && !Directory.EnumerateFiles(resourcesPath).Any()) {
-                Directory.Delete(resourcesPath);
-                File.Delete($"{resourcesPath}.meta");
-            }
-
-            var parentDirectory = Directory.GetParent(resourcesPath)!.FullName;
-            if (Directory.Exists(parentDirectory) && !Directory.EnumerateFiles(parentDirectory).Any()) {
-                Directory.Delete(parentDirectory);
-                File.Delete($"{parentDirectory}.meta");
+                // Clean up parent directory if empty
+                var parentPath = Path.Combine(Application.dataPath, "Generated");
+                if (Directory.Exists(parentPath) && !Directory.EnumerateFileSystemEntries(parentPath).Any()) {
+                    Directory.Delete(parentPath);
+                    var parentMetaPath = $"{parentPath}.meta";
+                    if (File.Exists(parentMetaPath)) {
+                        File.Delete(parentMetaPath);
+                    }
+                }
             }
 
             AssetDatabase.Refresh();
