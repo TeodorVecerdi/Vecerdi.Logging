@@ -16,12 +16,12 @@ namespace Vecerdi.Logging.Unity.Editor {
             settings.UpdateCategories();
 
             // Copy JSON settings file to StreamingAssets
-            var streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets", "Vecerdi.Logging");
-            if (!Directory.Exists(streamingAssetsPath)) {
-                Directory.CreateDirectory(streamingAssetsPath);
+            var resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
+            if (!Directory.Exists(resourcesPath)) {
+                Directory.CreateDirectory(resourcesPath);
             }
 
-            var destinationPath = Path.Combine(streamingAssetsPath, LoggingSettings.SETTINGS_FILE_NAME);
+            var destinationPath = Path.Combine(resourcesPath, LoggingSettings.SETTINGS_FILE_NAME);
             if (File.Exists(destinationPath)) {
                 File.Delete(destinationPath);
             }
@@ -39,20 +39,20 @@ namespace Vecerdi.Logging.Unity.Editor {
         public int callbackOrder => 0;
 
         public void OnPostprocessBuild(BuildReport report) {
-            var streamingAssetsPath = Path.Combine(Application.dataPath, "StreamingAssets", "Vecerdi.Logging");
-            var settingsPath = Path.Combine(streamingAssetsPath, LoggingSettings.SETTINGS_FILE_NAME);
+            var resourcesPath = Path.Combine(Application.dataPath, "Resources", "Vecerdi.Logging");
+            var settingsPath = Path.Combine(resourcesPath, LoggingSettings.SETTINGS_FILE_NAME);
 
             if (File.Exists(settingsPath)) {
                 File.Delete(settingsPath);
                 File.Delete($"{settingsPath}.meta");
             }
 
-            if (Directory.Exists(streamingAssetsPath) && !Directory.EnumerateFiles(streamingAssetsPath).Any()) {
-                Directory.Delete(streamingAssetsPath);
-                File.Delete($"{streamingAssetsPath}.meta");
+            if (Directory.Exists(resourcesPath) && !Directory.EnumerateFiles(resourcesPath).Any()) {
+                Directory.Delete(resourcesPath);
+                File.Delete($"{resourcesPath}.meta");
             }
 
-            var parentDirectory = Directory.GetParent(streamingAssetsPath)!.FullName;
+            var parentDirectory = Directory.GetParent(resourcesPath)!.FullName;
             if (Directory.Exists(parentDirectory) && !Directory.EnumerateFiles(parentDirectory).Any()) {
                 Directory.Delete(parentDirectory);
                 File.Delete($"{parentDirectory}.meta");

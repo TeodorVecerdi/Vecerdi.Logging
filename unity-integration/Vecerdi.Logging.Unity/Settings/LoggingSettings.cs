@@ -27,7 +27,6 @@ namespace Vecerdi.Logging.Unity {
     public class LoggingSettings {
         public const string SETTINGS_FILE_NAME = "LoggingSettings.json";
         public static string LoggingSettingsPath => Path.Combine(CustomProjectSettings.ProjectSettingsPath, SETTINGS_FILE_NAME);
-        public static string RuntimeSettingsPath => Path.Combine(Application.streamingAssetsPath, "Vecerdi.Logging", SETTINGS_FILE_NAME);
         private static LoggingSettings? s_Instance;
 
         private LoggingSettingsData m_Data = new();
@@ -145,26 +144,13 @@ namespace Vecerdi.Logging.Unity {
             }
 #else
             // In builds, try StreamingAssets first, then fallback to Resources folder
-            string settingsPath = RuntimeSettingsPath;
-            if (File.Exists(settingsPath)) {
-                string json = File.ReadAllText(settingsPath);
-                JsonUtility.FromJsonOverwrite(json, s_Instance.m_Data);
-            } else {
-                // Fallback to legacy Resources loading for backward compatibility
-                var legacySettings = Resources.Load<ScriptableObject>("Vecerdi.Logging/LoggingSettings");
-                if (legacySettings != null) {
-                    string json = JsonUtility.ToJson(legacySettings);
-                    JsonUtility.FromJsonOverwrite(json, s_Instance.m_Data);
-                }
+            var settingsAsset = Resources.Load<TextAsset>("Vecerdi.Logging/LoggingSettings");
+            if (settingsAsset != null) {
+                JsonUtility.FromJsonOverwrite(settingsAsset.text, s_Instance.m_Data);
             }
 #endif
             s_Instance.UpdateCategories();
             return s_Instance;
-        }
-
-        // Internal method for testing purposes only
-        internal static void _ResetInstance() {
-            s_Instance = null;
         }
 
         public void TransformAllCategoryNames() {
@@ -220,6 +206,7 @@ namespace Vecerdi.Logging.Unity {
             get => m_CategoryName;
             set => m_CategoryName = value;
         }
+
         public string OriginalCategoryName => m_OriginalCategoryName;
         public LogLevel LogLevel => m_LogLevel;
 
