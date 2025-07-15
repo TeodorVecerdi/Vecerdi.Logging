@@ -77,19 +77,11 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             VisualElement changeTracker = new();
             changeTracker.TrackSerializedObjectValue(SerializedSettings, _ => {
-                // Update the actual LoggingSettings with the serialized data
-                var data = m_SettingsWrapper!.Data;
                 var settings = LoggingSettings;
-                settings.GlobalLogLevel = data.GlobalLogLevel;
-                settings.CategoryNameTransforms = data.CategoryNameTransforms;
-                settings.EnableColoredOutputInEditor = data.EnableColoredOutputInEditor;
-                settings.OverrideGlobalLogLevelInBuilds = data.OverrideGlobalLogLevelInBuilds;
-                settings.GlobalLogLevelInBuilds = data.GlobalLogLevelInBuilds;
-                settings.LogMessagesOnMainThread = data.LogMessagesOnMainThread;
-
-                // Update categories - more complex since it's a list
-                settings.LogCategories.Clear();
-                settings.LogCategories.AddRange(data.LogCategories);
+                if (!ReferenceEquals(settings.GetSerializableData(), m_SettingsWrapper!.Data)) {
+                    Debug.LogError("Serialized wrapper data instance does not match the actual settings instance. This should never happen.");
+                    return;
+                }
 
                 settings.Save();
             });
