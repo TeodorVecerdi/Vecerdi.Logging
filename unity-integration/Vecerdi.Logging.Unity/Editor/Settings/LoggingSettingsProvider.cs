@@ -78,7 +78,7 @@ namespace Vecerdi.Logging.Unity.Editor {
             VisualElement changeTracker = new();
             changeTracker.TrackSerializedObjectValue(SerializedSettings, _ => {
                 var settings = LoggingSettings;
-                if (settings.GetSerializableData() != m_SettingsWrapper!.Data) {
+                if (!ReferenceEquals(settings.GetSerializableData(), m_SettingsWrapper!.Data)) {
                     Debug.LogError("Serialized wrapper data instance does not match the actual settings instance. This should never happen.");
                     return;
                 }
