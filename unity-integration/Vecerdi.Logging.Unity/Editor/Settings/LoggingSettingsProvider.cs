@@ -42,13 +42,6 @@ namespace Vecerdi.Logging.Unity.Editor {
             }
         }
 
-        private void RefreshSerializedObject() {
-            if (m_SettingsWrapper != null && m_SerializedSettings != null) {
-                m_SettingsWrapper.SetData(LoggingSettings.GetSerializableData());
-                m_SerializedSettings.Update();
-            }
-        }
-
         private static StyleSheet? s_StyleSheet;
 
         public LoggingSettingsProvider(string path, SettingsScope scopes = SettingsScope.Project, IEnumerable<string>? keywords = null)
@@ -99,15 +92,6 @@ namespace Vecerdi.Logging.Unity.Editor {
                 settings.LogCategories.AddRange(data.LogCategories);
 
                 settings.Save();
-                
-                // Refresh the SerializedObject to prevent stale property references
-                RefreshSerializedObject();
-                
-                // Refresh the ListView if it exists
-                var listView = rootElement.Q<ListView>("LogCategoriesListView");
-                if (listView != null) {
-                    listView.RefreshItems();
-                }
             });
             rootElement.Add(changeTracker);
 
@@ -220,49 +204,25 @@ namespace Vecerdi.Logging.Unity.Editor {
 
             Action<VisualElement, int> bindItem = (element, index) => {
                 var originalIndex = logCategoriesList.GetOriginalIndex(index);
-                
-                // Always get fresh SerializedProperty references to avoid stale references
-                var freshLogCategoriesProperty = SerializedSettings.FindProperty("m_Data").FindPropertyRelative("LogCategories");
-                
-                // Ensure the array element exists and is valid
-                if (originalIndex >= 0 && originalIndex < freshLogCategoriesProperty.arraySize) {
-                    var logCategory = freshLogCategoriesProperty.GetArrayElementAtIndex(originalIndex);
+                var logCategory = logCategoriesProperty.GetArrayElementAtIndex(originalIndex);
 
-                    // Bind the category name field
-                    var logCategoryName = logCategory.FindPropertyRelative("m_CategoryName");
-                    var categoryName = element.Q<TextField>(className: "category-list__category-name");
-                    if (logCategoryName != null && categoryName != null) {
-                        categoryName.Unbind(); // Clear any previous binding
-                        categoryName.BindProperty(logCategoryName);
-                        categoryName.viewDataKey = logCategoryName.stringValue;
-                    }
-
-                    // Bind the log level field
-                    var logCategoryLogLevel = logCategory.FindPropertyRelative("m_LogLevel");
-                    var logLevel = element.Q<EnumField>(className: "category-list__log-level");
-                    if (logCategoryLogLevel != null && logLevel != null) {
-                        logLevel.Unbind(); // Clear any previous binding
-                        logLevel.BindProperty(logCategoryLogLevel);
-                        logLevel.viewDataKey = logCategoryLogLevel.enumValueIndex.ToString();
-                    }
-                }
-            };
-
-            Action<VisualElement, int> unbindItem = (element, index) => {
-                // Unbind the category name field
+                // Bind the category name field
+                var logCategoryName = logCategory.FindPropertyRelative("m_CategoryName");
                 var categoryName = element.Q<TextField>(className: "category-list__category-name");
-                categoryName?.Unbind();
+                categoryName.BindProperty(logCategoryName);
+                categoryName.viewDataKey = logCategoryName.stringValue;
 
-                // Unbind the log level field
+                // Bind the log level field
+                var logCategoryLogLevel = logCategory.FindPropertyRelative("m_LogLevel");
                 var logLevel = element.Q<EnumField>(className: "category-list__log-level");
-                logLevel?.Unbind();
+                logLevel.BindProperty(logCategoryLogLevel);
+                logLevel.viewDataKey = logCategoryLogLevel.enumValueIndex.ToString();
             };
 
             ListView logCategoriesListView = new() {
                 name = "LogCategoriesListView",
                 makeItem = makeItem,
                 bindItem = bindItem,
-                unbindItem = unbindItem,
                 showBoundCollectionSize = false,
                 itemsSource = logCategoriesList,
             };

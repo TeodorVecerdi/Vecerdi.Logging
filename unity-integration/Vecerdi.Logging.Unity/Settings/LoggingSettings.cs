@@ -209,10 +209,7 @@ namespace Vecerdi.Logging.Unity {
         }
 
         public string OriginalCategoryName => m_OriginalCategoryName;
-        public LogLevel LogLevel {
-            get => m_LogLevel;
-            set => m_LogLevel = value;
-        }
+        public LogLevel LogLevel => m_LogLevel;
 
         public LogCategory(string categoryName, string originalCategoryName, LogLevel logLevel) {
             m_CategoryName = categoryName;
