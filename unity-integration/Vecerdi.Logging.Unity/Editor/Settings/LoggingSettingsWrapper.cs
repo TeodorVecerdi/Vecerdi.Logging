@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using UnityEngine;
 
-namespace Vecerdi.Logging.Unity.Editor {
+namespace Vecerdi.Logging.Unity.Editor.Settings {
     internal class LoggingSettingsWrapper : ScriptableObject {
         [SerializeField] private LoggingSettingsData m_Data = new();
 

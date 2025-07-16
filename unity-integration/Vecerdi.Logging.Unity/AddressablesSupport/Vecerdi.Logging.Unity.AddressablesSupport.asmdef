@@ -1,8 +1,10 @@
 {
-    "name": "Vecerdi.Logging.Unity.Editor",
+    "name": "Vecerdi.Logging.Unity.AddressablesSupport",
     "rootNamespace": "",
     "references": [
-        "Vecerdi.Logging.Unity"
+        "Vecerdi.Logging.Unity",
+        "Vecerdi.Logging.Unity.Editor",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"
@@ -12,7 +14,9 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "UNITY_ADDRESSABLES"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }
