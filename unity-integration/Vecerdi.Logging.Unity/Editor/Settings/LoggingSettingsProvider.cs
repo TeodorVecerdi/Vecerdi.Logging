@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
-namespace Vecerdi.Logging.Unity.Editor {
+namespace Vecerdi.Logging.Unity.Editor.Settings {
     // A ScriptableObject wrapper to enable Unity's SerializedObject functionality
 
     public class LoggingSettingsProvider : SettingsProvider {

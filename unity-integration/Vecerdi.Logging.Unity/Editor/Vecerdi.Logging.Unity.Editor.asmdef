@@ -1,6 +1,6 @@
 {
     "name": "Vecerdi.Logging.Unity.Editor",
-    "rootNamespace": "Vecerdi.Logging.Unity.Editor",
+    "rootNamespace": "",
     "references": [
         "Vecerdi.Logging.Unity"
     ],

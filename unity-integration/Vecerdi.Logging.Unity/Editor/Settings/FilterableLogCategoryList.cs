@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
 
-namespace Vecerdi.Logging.Unity.Editor {
+namespace Vecerdi.Logging.Unity.Editor.Settings {
     public class FilterableLogCategoryList : IList<LogCategory>, IList {
         public enum SortModes { None, Ascending, Descending }
         public enum SortFields { CategoryName, LogLevel }
