@@ -16,7 +16,7 @@ namespace Vecerdi.Logging.Unity {
         }
 
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void Initialize() {
+        public static void Initialize() {
             Threading.MainThreadId = Thread.CurrentThread.ManagedThreadId;
             Threading.MainThread = SynchronizationContext.Current;
             Threading.IsPlaying = true;
