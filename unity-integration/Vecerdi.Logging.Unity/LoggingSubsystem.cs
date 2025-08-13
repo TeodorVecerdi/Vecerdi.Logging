@@ -6,7 +6,7 @@ using UnityEditor;
 #endif
 
 namespace Vecerdi.Logging.Unity {
-    internal static partial class LoggingSubsystem {
+    public static partial class LoggingSubsystem {
         internal static class Threading {
             internal static int MainThreadId { get; set; }
             internal static SynchronizationContext? MainThread { get; set; }
@@ -30,7 +30,7 @@ namespace Vecerdi.Logging.Unity {
 
 #if UNITY_EDITOR
     [InitializeOnLoad]
-    internal static partial class LoggingSubsystem {
+    public static partial class LoggingSubsystem {
         static LoggingSubsystem() {
             Register();
             EditorApplication.playModeStateChanged -= RegisterWhenExitingPlayMode;
